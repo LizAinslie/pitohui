@@ -69,7 +69,7 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
 object ModuleSwitchTable : CompositeIdTable("module_switches") {
     val platform = enumerationByName<Platforms>("platform", 32).entityId()
     val platformId = varchar("platform_id", 255).uniqueIndex().entityId()
-    val moduleName = varchar("module_name", 255).uniqueIndex().entityId()
+    val moduleName = varchar("module_name", 255).entityId()
     val enabled = bool("enabled").default(true)
 
     override val primaryKey = PrimaryKey(platform, platformId, moduleName)
