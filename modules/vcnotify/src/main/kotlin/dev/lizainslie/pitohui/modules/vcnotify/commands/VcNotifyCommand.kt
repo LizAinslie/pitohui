@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.time.Duration.Companion.seconds
 
 internal suspend fun CommandContext.respondNotInChannel() {
     respond("You must be in a voice channel to use this command.")
@@ -28,10 +29,6 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
     platforms(Platforms.DISCORD)
 
     handle { context ->
-        // todo: check if user is in a voice channel
-
-        ///. actually thinkin they should just be in a guild idgaf ill polish this later
-
         if (context !is DiscordSlashCommandContext) {
             context.respond("This command is currently only available on Discord.")
             return@handle
@@ -68,14 +65,7 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
             return@handle
         }
 
-        if (lastUsedRecord != null) {
-            val timeSinceLastUse = Clock.System.now() - lastUsedRecord.time
-            val remainingTime = settings.cooldown - timeSinceLastUse
-
-            context.interaction.respondEphemeral {
-                content = "You have already notified members in this voice channel recently.\nYou must wait ${remainingTime.inWholeMinutes} minutes before notifying again.\n-# Last used by ${lastUsedRecord.user}."
-            }
-        } else {
+        suspend fun notify() {
             VcNotifyModule.communitiesLastUsed[platformId] = VcNotifyRecord(
                 time = Clock.System.now(),
                 user = guildInteraction.user.mention
@@ -91,7 +81,7 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                 guildInteraction.guild.roles.firstOrNull { role -> role.id.value == id }
             } ?: run {
                 context.respond("The role set to notify was not found or has been removed. Please contact an admin.")
-                return@handle
+                return
             }
 
             context.interaction.respondPublic {
@@ -102,5 +92,18 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                     .replace("{channel}", channel.mention)
             }
         }
+
+        if (lastUsedRecord != null) {
+            val timeSinceLastUse = Clock.System.now() - lastUsedRecord.time
+            val remainingTime = settings.cooldown - timeSinceLastUse
+
+            if (remainingTime > 0.seconds) {
+                context.interaction.respondEphemeral {
+                    content = "You have already notified members in this voice channel recently.\nYou must wait ${remainingTime.inWholeMinutes} minutes before notifying again.\n-# Last used by ${lastUsedRecord.user}."
+                }
+
+                return@handle
+            } else notify()
+        } else notify()
     }
 }
