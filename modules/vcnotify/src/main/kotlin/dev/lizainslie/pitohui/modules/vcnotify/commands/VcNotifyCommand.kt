@@ -11,6 +11,7 @@ import dev.lizainslie.pitohui.core.platforms.Platforms
 import dev.lizainslie.pitohui.modules.vcnotify.VcNotifyModule
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifyRecord
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
+import dev.lizainslie.pitohui.util.time.formatDuration
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -99,7 +100,7 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
 
             if (remainingTime > 0.seconds) {
                 context.interaction.respondEphemeral {
-                    content = "You have already notified members in this voice channel recently.\nYou must wait ${remainingTime.inWholeMinutes} minutes before notifying again.\n-# Last used by ${lastUsedRecord.user}."
+                    content = "You have already notified members in this voice channel recently.\nYou must wait ${formatDuration(remainingTime)} before notifying again.\n-# Last used by ${lastUsedRecord.user}."
                 }
 
                 return@handle
