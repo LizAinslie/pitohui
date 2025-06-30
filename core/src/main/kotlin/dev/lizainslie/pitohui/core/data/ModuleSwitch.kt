@@ -7,9 +7,6 @@ import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 
 class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
@@ -65,6 +62,7 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
 
 // inb4 this shit catches on fire the first time i run it
 // i FUCKING CALLED IT lmao
+// it broke even more past me never realized how right it was,,
 
 object ModuleSwitchTable : CompositeIdTable("module_switches") {
     val platform = enumerationByName<Platforms>("platform", 32).entityId()

@@ -1,8 +1,10 @@
 ﻿package dev.lizainslie.pitohui.modules.vcnotify.commands
 
+import dev.kord.common.entity.AllowedMentionType
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.respondPublic
 import dev.kord.core.entity.interaction.GuildChatInputCommandInteraction
+import dev.kord.rest.builder.message.allowedMentions
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.commands.platform.DiscordSlashCommandContext
@@ -91,6 +93,11 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                     .replace("{user}", guildInteraction.user.mention)
                     .replace("{channelLink}", "https://discord.com/channels/${guildInteraction.guildId.value}/${voiceState.channelId!!.value}")
                     .replace("{channel}", channel.mention)
+
+                allowedMentions {
+                    roles += role.id
+                    users += guildInteraction.user.id
+                }
             }
         }
 

@@ -4,13 +4,12 @@ import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.Platforms
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
-import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.kotlin.datetime.duration
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 class VcNotifySettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
@@ -33,7 +32,7 @@ class VcNotifySettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
         fun create(
             platformId: PlatformId,
             messageFormat: String = "{role} {user} is now in {channelLink}! Join them!",
-            cooldown: kotlin.time.Duration = 30.minutes,
+            cooldown: Duration = 30.minutes,
             roleId: ULong? = null,
         ): VcNotifySettings {
             return new(CompositeID { id ->
@@ -48,7 +47,7 @@ class VcNotifySettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
     }
 }
 
-object VcNotifySettingsTable : CompositeIdTable("vc_notify_settings") {
+object VcNotifySettingsTable : CompositeIdTable("vc_notify_guild_settings") {
     val platform = enumerationByName<Platforms>("platform", 32).entityId()
     val platformId = varchar("platform_id", 255).entityId()
 
