@@ -19,6 +19,7 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
 import dev.lizainslie.pitohui.core.modules.AbstractModule
+import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
@@ -87,6 +88,8 @@ class Discord(config: DiscordPlatformConfig) : PlatformAdapter<DiscordPlatformCo
     }
 
     override suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
+        if (module.visibility == ModuleVisibility.DEVELOPER) return // don't register slash commands for dev commands. todo: write text parser
+
         for (guildId in config.guilds) {
             println("registering command ${command.name} in guild $guildId")
             kord.createGuildChatInputCommand(

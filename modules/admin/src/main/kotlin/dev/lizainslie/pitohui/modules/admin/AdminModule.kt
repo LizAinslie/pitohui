@@ -5,6 +5,7 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import dev.lizainslie.pitohui.modules.admin.commands.MigrateCommand
+import dev.lizainslie.pitohui.modules.admin.commands.ToggleStealthCommand
 import dev.lizainslie.pitohui.modules.system.SystemModule
 import dev.lizainslie.pitohui.platforms.discord.Discord
 
@@ -16,6 +17,7 @@ object AdminModule : AbstractModule() {
     override val description = "Administrative commands for Pitohui"
     override val commands = setOf(
         MigrateCommand,
+        ToggleStealthCommand
     )
     override val dependencies = setOf(SystemModule.name)
 

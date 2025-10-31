@@ -12,6 +12,6 @@ abstract class DiscordCommandContext(
     platform: PlatformAdapterFactory<*, *>,
 ) : CommandContext(bot, module, platform) {
     abstract val channelId: PlatformId
-    abstract val userId: PlatformId
     abstract val guildId: PlatformId?
+    abstract val isInGuild: Boolean
 }

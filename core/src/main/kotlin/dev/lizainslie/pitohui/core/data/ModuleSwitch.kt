@@ -10,48 +10,48 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
 class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
-    var platformId by ModuleSwitchTable.platformId
+    var communityId by ModuleSwitchTable.communityId
     var platform by ModuleSwitchTable.platform
     var moduleName by ModuleSwitchTable.moduleName
     var enabled by ModuleSwitchTable.enabled
 
     companion object : CompositeEntityClass<ModuleSwitch>(ModuleSwitchTable) {
         fun isModuleEnabled(
-            platformId: String,
+            communityId: String,
             platform: PlatformKey,
             moduleName: String
         ) = find {
-            (ModuleSwitchTable.platformId eq platformId) and
+            (ModuleSwitchTable.communityId eq communityId) and
             (ModuleSwitchTable.platform eq platform.key) and
             (ModuleSwitchTable.moduleName eq moduleName)
         }.firstOrNull()?.enabled ?: false
 
         fun isModuleEnabled(
-            platformId: PlatformId,
+            communityId: PlatformId,
             moduleName: String
         ) = isModuleEnabled(
-            platformId.id,
-            platformId.platform,
+            communityId.id,
+            communityId.platform,
             moduleName
         )
 
         fun getSwitch(
-            platformId: PlatformId,
+            communityId: PlatformId,
             moduleName: String
         ): ModuleSwitch? = find {
-            (ModuleSwitchTable.platformId eq platformId.id) and
-            (ModuleSwitchTable.platform eq platformId.platform.key) and
+            (ModuleSwitchTable.communityId eq communityId.id) and
+            (ModuleSwitchTable.platform eq communityId.platform.key) and
             (ModuleSwitchTable.moduleName eq moduleName)
         }.firstOrNull()
 
         fun createSwitch(
-            platformId: PlatformId,
+            communityId: PlatformId,
             moduleName: String,
             enabled: Boolean = true
         ): ModuleSwitch {
             return new(CompositeID { id ->
-                id[ModuleSwitchTable.platformId] = platformId.id
-                id[ModuleSwitchTable.platform] = platformId.platform.key
+                id[ModuleSwitchTable.communityId] = communityId.id
+                id[ModuleSwitchTable.platform] = communityId.platform.key
                 id[ModuleSwitchTable.moduleName] = moduleName
             }) {
                 this.enabled = enabled
@@ -64,11 +64,13 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
 // i FUCKING CALLED IT lmao
 // it broke even more past me never realized how right it was,,
 
+// u can ignore above now sometimes the retard can cook <3
+
 object ModuleSwitchTable : CompositeIdTable("module_switches") {
     val platform = varchar("platform", 32).entityId()
-    val platformId = varchar("platform_id", 255).uniqueIndex().entityId()
+    val communityId = varchar("platform_id", 255).uniqueIndex().entityId()
     val moduleName = varchar("module_name", 255).entityId()
     val enabled = bool("enabled").default(true)
 
-    override val primaryKey = PrimaryKey(platform, platformId, moduleName)
+    override val primaryKey = PrimaryKey(platform, communityId, moduleName)
 }

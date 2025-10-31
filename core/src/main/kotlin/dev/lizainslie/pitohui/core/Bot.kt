@@ -3,6 +3,7 @@ package dev.lizainslie.pitohui.core
 import dev.lizainslie.pitohui.core.commands.Commands
 import dev.lizainslie.pitohui.core.config.BotConfig
 import dev.lizainslie.pitohui.core.data.DbContext
+import dev.lizainslie.pitohui.core.data.DeveloperOptionsTable
 import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
@@ -13,6 +14,9 @@ class Bot(
 ) {
     val db = DbContext(this).also {
         it.tables += ModuleSwitchTable
+        it.tables += DeveloperOptionsTable
+
+        it.migrate()
     }
 
     lateinit var commands: Commands
