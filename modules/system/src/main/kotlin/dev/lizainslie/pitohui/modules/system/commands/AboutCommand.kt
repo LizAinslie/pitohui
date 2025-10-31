@@ -1,10 +1,11 @@
-﻿package dev.lizainslie.pitohui.modules.system.commands
+package dev.lizainslie.pitohui.modules.system.commands
 
 import dev.kord.core.behavior.interaction.respondPublic
 import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.core.commands.platform.DiscordSlashCommandContext
+import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.core.platforms.Platforms
+import dev.lizainslie.pitohui.platforms.discord.extensions.DISCORD
 
 val BOT_DESCRIPTION = """Pitohui is a multi-platform bot for Discord, and more coming soon. It is designed to
 be modular and extensible, allowing for easy addition of new features. However,
@@ -15,14 +16,14 @@ val AboutCommand = defineCommand(
     name = "info",
     description = "About the bot",
 ) {
-    handle { context ->
+    handle {
         val thumbUrl = "https://btw.i-use-ar.ch/i/i3c8qlxducy87.gif"
 
-        when (context.platform) {
+        when (platform) {
             Platforms.DISCORD -> {
-                when (context) {
+                when (this) { // context is receiver
                     is DiscordSlashCommandContext -> {
-                        context.interaction.respondPublic {
+                        interaction.respondPublic {
                             embed {
                                 title = "About Pitohui"
                                 description = BOT_DESCRIPTION
@@ -36,10 +37,13 @@ val AboutCommand = defineCommand(
                                 // link to the original project in some way <3
                                 field("Author", true) { "[Mey/Lizzy Ainslie](https://lizainslie.dev)" }
                                 field("Source Code", true) { "[Git](https://git.lizainslie.dev/mey/pitohui)" }
-                                field("License", true) { "[MIT](https://git.lizainslie.dev/mey/pitohui/-/raw/main/LICENSE)" } // todo: change this link when put on git
+                                field(
+                                    "License",
+                                    true
+                                ) { "[MIT](https://git.lizainslie.dev/mey/pitohui/-/raw/main/LICENSE)" }
 
                                 footer {
-                                    text = "Pitohui v{version}, receiving on ${context.platform.displayName}."
+                                    text = "Pitohui v{version}, receiving on ${platform}."
                                 }
                             }
                         }

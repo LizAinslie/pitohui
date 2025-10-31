@@ -1,7 +1,7 @@
-﻿package dev.lizainslie.pitohui.core.data
+package dev.lizainslie.pitohui.core.data
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
-import dev.lizainslie.pitohui.core.platforms.Platforms
+import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
@@ -18,11 +18,11 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
     companion object : CompositeEntityClass<ModuleSwitch>(ModuleSwitchTable) {
         fun isModuleEnabled(
             platformId: String,
-            platform: Platforms,
+            platform: PlatformKey,
             moduleName: String
         ) = find {
             (ModuleSwitchTable.platformId eq platformId) and
-            (ModuleSwitchTable.platform eq platform) and
+            (ModuleSwitchTable.platform eq platform.key) and
             (ModuleSwitchTable.moduleName eq moduleName)
         }.firstOrNull()?.enabled ?: false
 
@@ -40,7 +40,7 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
             moduleName: String
         ): ModuleSwitch? = find {
             (ModuleSwitchTable.platformId eq platformId.id) and
-            (ModuleSwitchTable.platform eq platformId.platform) and
+            (ModuleSwitchTable.platform eq platformId.platform.key) and
             (ModuleSwitchTable.moduleName eq moduleName)
         }.firstOrNull()
 
@@ -51,7 +51,7 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
         ): ModuleSwitch {
             return new(CompositeID { id ->
                 id[ModuleSwitchTable.platformId] = platformId.id
-                id[ModuleSwitchTable.platform] = platformId.platform
+                id[ModuleSwitchTable.platform] = platformId.platform.key
                 id[ModuleSwitchTable.moduleName] = moduleName
             }) {
                 this.enabled = enabled
@@ -65,7 +65,7 @@ class ModuleSwitch(id: EntityID<CompositeID>) : CompositeEntity(id) {
 // it broke even more past me never realized how right it was,,
 
 object ModuleSwitchTable : CompositeIdTable("module_switches") {
-    val platform = enumerationByName<Platforms>("platform", 32).entityId()
+    val platform = varchar("platform", 32).entityId()
     val platformId = varchar("platform_id", 255).uniqueIndex().entityId()
     val moduleName = varchar("module_name", 255).entityId()
     val enabled = bool("enabled").default(true)

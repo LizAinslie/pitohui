@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.modules.system.commands
+package dev.lizainslie.pitohui.modules.system.commands
 
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
@@ -7,8 +7,8 @@ val SettingsCommand = defineCommand(
     "settings",
     "View and edit your community's settings",
 ) {
-    handle { context ->
-        context.respond("Provide a setting to view or edit")
+    handle {
+        respond("Provide a setting to view or edit")
     }
 
     subCommand(
@@ -21,11 +21,11 @@ val SettingsCommand = defineCommand(
             type = ArgumentTypes.CHANNEL
         )
 
-        handle { context ->
-            val channel = channelArg.resolve(context)
+        handle {
+            val channel = args[channelArg]
 
-            if (channel != null) context.respond("Modlog channel set to ${channel.mention}")
-            else context.respond("Modlog channel currently set to [#example-channel]")
+            if (channel != null) respond("Modlog channel set to $channel")
+            else respond("Modlog channel currently set to [#example-channel]")
         }
     }
 }

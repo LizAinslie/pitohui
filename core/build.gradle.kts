@@ -7,7 +7,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kord.core)
     implementation(libs.bundles.exposed)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(kotlin("test"))

@@ -1,6 +1,3 @@
-﻿package dev.lizainslie.pitohui.core.platforms
+package dev.lizainslie.pitohui.core.platforms
 
-enum class Platforms(val displayName: String) {
-    DISCORD("Discord"),
-    ;
-}
+object Platforms // to be extended in platform support modules.

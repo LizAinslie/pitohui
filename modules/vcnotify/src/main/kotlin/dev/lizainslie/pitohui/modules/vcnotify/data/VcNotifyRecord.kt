@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.modules.vcnotify.data
+package dev.lizainslie.pitohui.modules.vcnotify.data
 
 import kotlinx.datetime.Instant
 

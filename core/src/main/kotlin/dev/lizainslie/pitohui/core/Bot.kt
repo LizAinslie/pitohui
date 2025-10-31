@@ -1,15 +1,12 @@
-﻿package dev.lizainslie.pitohui.core
+package dev.lizainslie.pitohui.core
 
-import dev.kord.common.entity.Snowflake
-import dev.kord.core.Kord
-import dev.kord.gateway.ALL
-import dev.kord.gateway.Intents
-import dev.kord.gateway.PrivilegedIntent
 import dev.lizainslie.pitohui.core.commands.Commands
 import dev.lizainslie.pitohui.core.config.BotConfig
 import dev.lizainslie.pitohui.core.data.DbContext
 import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.modules.AbstractModule
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 
 class Bot(
     val config: BotConfig,
@@ -18,12 +15,22 @@ class Bot(
         it.tables += ModuleSwitchTable
     }
 
-    lateinit var kord: Kord
     lateinit var commands: Commands
 
     val modules = mutableListOf<AbstractModule>()
+    val platformAdapters = mutableListOf<PlatformAdapterFactory<*, *>>()
 
+    fun enablePlatforms(vararg platforms: PlatformAdapterFactory<*, *>) {
+        platforms.forEach { adapter ->
+            if (platformAdapters.none { it.key == adapter.key }) platformAdapters.add(adapter)
+        }
+    }
 
+    suspend fun eachPlatform(block: suspend (platformAdapter: PlatformAdapter<*>) -> Unit) {
+        for (platform in platformAdapters) {
+            block(platform.get())
+        }
+    }
 
     fun loadModule(module: AbstractModule) {
         if (modules.any { it.name == module.name }) {
@@ -44,9 +51,16 @@ class Bot(
     }
 
     suspend fun init() {
-        kord = Kord(config.token)
         commands = Commands(this)
-        commands.initialize()
+
+        platformAdapters.forEach {
+            it.load()
+        }
+
+        eachPlatform {
+            it.initialize(this)
+        }
+
 
         for (module in modules) {
             module.onInit(this)
@@ -57,13 +71,9 @@ class Bot(
         }
     }
 
-    @OptIn(PrivilegedIntent::class)
-    suspend fun login() {
-        kord.login {
-            intents = Intents.ALL
+    suspend fun start() {
+        eachPlatform {
+            it.start(this)
         }
     }
-
-    suspend fun getDiscordChannelById(id: Snowflake) = kord.getChannel(id)
-    suspend fun getDiscordChannelById(id: Long) = kord.getChannel(Snowflake(id))
 }

@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.util.time
+package dev.lizainslie.pitohui.util.time
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

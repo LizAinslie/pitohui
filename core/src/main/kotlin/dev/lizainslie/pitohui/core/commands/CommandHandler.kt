@@ -1,5 +1,3 @@
-﻿package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.core.commands
 
-fun interface CommandHandler {
-    suspend fun handle(context: CommandContext)
-}
+typealias CommandHandler = suspend CommandContext.() -> Unit

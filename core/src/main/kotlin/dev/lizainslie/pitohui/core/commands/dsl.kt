@@ -1,5 +1,7 @@
-﻿package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.core.commands
 
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import dev.lizainslie.pitohui.core.platforms.Platforms
 
 open class BaseCommandDsl(
@@ -8,11 +10,11 @@ open class BaseCommandDsl(
 ) {
     lateinit var handler: CommandHandler
 
-    protected val platforms = mutableSetOf<Platforms>()
+    protected val platforms = mutableSetOf<PlatformKey>()
     protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
 
-    fun platforms(vararg platforms: Platforms) {
-        this.platforms.addAll(platforms)
+    fun platforms(vararg platforms: PlatformAdapterFactory<*, *>) {
+        this.platforms.addAll(platforms.map { it.key })
     }
 
     fun handle(block: CommandHandler) {
@@ -50,16 +52,16 @@ class RootCommandDsl(
 
     fun buildRoot(): RootCommand {
         val subCommands = subCommands
-        val platforms = if (platforms.isEmpty()) Platforms.entries.toSet() else platforms
+        val platforms = platforms
         val arguments = arguments
 
         return object : RootCommand(name, description) {
             override val subCommands: List<SubCommand> = subCommands.map { it.buildSubCommand(this) }
-            override val platforms: Set<Platforms> = platforms
+            override val platforms: Set<PlatformKey> = platforms
             override val arguments: List<ArgumentDescriptor<*>> = arguments
 
             override suspend fun handle(context: CommandContext) {
-                handler.handle(context)
+                handler(context)
             }
         }
     }
@@ -73,11 +75,11 @@ class SubCommandDsl(
         val arguments = arguments
 
         return object : SubCommand(name, description, parent) {
-            override val platforms: Set<Platforms> = parent.platforms
+            override val platforms: Set<PlatformKey> = parent.platforms
             override val arguments: List<ArgumentDescriptor<*>> = arguments
 
             override suspend fun handle(context: CommandContext) {
-                handler.handle(context)
+                handler(context)
             }
         }
     }

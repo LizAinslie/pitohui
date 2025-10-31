@@ -16,7 +16,7 @@
           </compositeBuild>
         </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
+        <option name="gradleJvm" value="21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -25,8 +25,11 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/modules" />
             <option value="$PROJECT_DIR$/modules/admin" />
+            <option value="$PROJECT_DIR$/modules/message-embedder" />
             <option value="$PROJECT_DIR$/modules/system" />
             <option value="$PROJECT_DIR$/modules/vcnotify" />
+            <option value="$PROJECT_DIR$/platforms" />
+            <option value="$PROJECT_DIR$/platforms/discord" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,6 +1,7 @@
-﻿package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.core.commands
 
-import dev.lizainslie.pitohui.core.platforms.Platforms
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import dev.lizainslie.pitohui.core.platforms.PlatformKey
 
 abstract class BaseCommand(
     val name: String,
@@ -8,10 +9,14 @@ abstract class BaseCommand(
 ) {
     abstract val rootName: String
 
-    open val platforms: Set<Platforms> = Platforms.entries.toSet()
+    open val platforms: Set<PlatformKey> = emptySet()
     open val arguments: List<ArgumentDescriptor<*>> = emptyList()
 
     abstract suspend fun handle(context: CommandContext)
+
+    fun supportsPlatform(platform: PlatformAdapterFactory<*, *>) =
+        if (platforms.isEmpty()) true
+        else platforms.contains(platform.key)
 }
 
 abstract class RootCommand(

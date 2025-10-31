@@ -1,6 +1,5 @@
-﻿package dev.lizainslie.pitohui.core.config
+package dev.lizainslie.pitohui.core.config
 
-import dev.kord.common.entity.Snowflake
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -14,8 +13,6 @@ data class DatabaseConfig(
 
 @Serializable
 data class BotConfig(
-    val token: String,
-    val guilds: List<@Serializable(with = SnowflakeAsStringSerializer::class) Snowflake>,
     val db: DatabaseConfig,
 ) {
     companion object {

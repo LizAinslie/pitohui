@@ -1,7 +1,6 @@
-﻿package dev.lizainslie.pitohui.modules.vcnotify.data
+package dev.lizainslie.pitohui.modules.vcnotify.data
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
-import dev.lizainslie.pitohui.core.platforms.Platforms
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
@@ -13,7 +12,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 class VcNotifySettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
-    var platformId by VcNotifySettingsTable.platformId
+    var communityId by VcNotifySettingsTable.communityId
     var platform by VcNotifySettingsTable.platform
     var roleId by VcNotifySettingsTable.roleId
     var messageFormat by VcNotifySettingsTable.messageFormat
@@ -21,42 +20,40 @@ class VcNotifySettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
 
     companion object : CompositeEntityClass<VcNotifySettings>(VcNotifySettingsTable) {
         fun getSettings(
-            platformId: PlatformId,
-        ) : VcNotifySettings? {
+            communityId: PlatformId,
+        ): VcNotifySettings? {
             return find {
-                (VcNotifySettingsTable.platformId eq platformId.id) and
-                (VcNotifySettingsTable.platform eq platformId.platform)
+                (VcNotifySettingsTable.communityId eq communityId.id) and
+                        (VcNotifySettingsTable.platform eq communityId.platform.key)
             }.firstOrNull()
         }
 
         fun create(
-            platformId: PlatformId,
+            communityId: PlatformId,
             messageFormat: String = "{role} {user} is now in {channelLink}! Join them!",
             cooldown: Duration = 30.minutes,
-            roleId: ULong? = null,
+            roleId: PlatformId? = null,
         ): VcNotifySettings {
             return new(CompositeID { id ->
-                id[VcNotifySettingsTable.platformId] = platformId.id
-                id[VcNotifySettingsTable.platform] = platformId.platform
+                id[VcNotifySettingsTable.communityId] = communityId.id
+                id[VcNotifySettingsTable.platform] = communityId.platform.key
             }) {
                 this.messageFormat = messageFormat
                 this.cooldown = cooldown
-                this.roleId = roleId
+                this.roleId = roleId?.id
             }
         }
     }
 }
 
 object VcNotifySettingsTable : CompositeIdTable("vc_notify_guild_settings") {
-    val platform = enumerationByName<Platforms>("platform", 32).entityId()
-    val platformId = varchar("platform_id", 255).entityId()
+    val platform = varchar("platform", 32).entityId()
+    val communityId = varchar("community_id", 255).entityId()
 
     val messageFormat = varchar("message_format", 255).default("{role} {user} is now in {channelLink}! Join them!")
     val cooldown = duration("cooldown").default(30.minutes)
 
-    // todo: this is pretty discord-specific, consider making it more generic or
-    //  use a separate platform-specific hierarchical table
-    val roleId = ulong("role_id").nullable().default(null)
+    val roleId = varchar("role_id", 255).nullable().default(null)
 
-    override val primaryKey = PrimaryKey(platform, platformId)
+    override val primaryKey = PrimaryKey(platform, communityId)
 }

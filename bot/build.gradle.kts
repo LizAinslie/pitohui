@@ -10,9 +10,11 @@ plugins {
 }
 dependencies {
     implementation(project(":core"))
+    implementation(project(":platforms:discord"))
     implementation(project(":modules:system"))
     implementation(project(":modules:admin"))
     implementation(project(":modules:vcnotify"))
+    implementation(project(":modules:message-embedder"))
 
     implementation(libs.bundles.kord)
     implementation(libs.bundles.exposed)

@@ -1,15 +1,6 @@
-﻿package dev.lizainslie.pitohui.core.platforms
-
-import dev.kord.common.entity.Snowflake
+package dev.lizainslie.pitohui.core.platforms
 
 data class PlatformId(
-    val platform: Platforms,
+    val platform: PlatformKey,
     val id: String
-) {
-    companion object {
-        fun fromSnowflake(snowflake: Snowflake) = PlatformId(
-            platform = Platforms.DISCORD,
-            id = snowflake.value.toString()
-        )
-    }
-}
+)

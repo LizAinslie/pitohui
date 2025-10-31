@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.platforms.discord.extensions
 
 import dev.kord.rest.builder.interaction.BaseInputChatBuilder
 import dev.kord.rest.builder.interaction.RootInputChatBuilder
@@ -7,6 +7,9 @@ import dev.kord.rest.builder.interaction.integer
 import dev.kord.rest.builder.interaction.role
 import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.interaction.subCommand
+import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.SubCommand
 import kotlin.collections.forEach
 
 fun BaseInputChatBuilder.arguments(arguments: List<ArgumentDescriptor<*>>) {

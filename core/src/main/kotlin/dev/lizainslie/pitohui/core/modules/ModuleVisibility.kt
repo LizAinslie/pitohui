@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.core.modules
+package dev.lizainslie.pitohui.core.modules
 
 enum class ModuleVisibility {
     PUBLIC,

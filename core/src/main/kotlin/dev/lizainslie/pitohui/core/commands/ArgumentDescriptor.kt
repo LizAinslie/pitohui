@@ -1,6 +1,4 @@
-﻿package dev.lizainslie.pitohui.core.commands
-
-import dev.lizainslie.pitohui.core.commands.platform.DiscordSlashCommandContext
+package dev.lizainslie.pitohui.core.commands
 
 class ArgumentDescriptor<T>(
     val name: String,
@@ -12,28 +10,13 @@ class ArgumentDescriptor<T>(
 ) {
     suspend fun resolve(commandContext: CommandContext): T? {
         println("Resolving argument `$name` with type `${argumentType::class.simpleName}`")
-        val value = when (commandContext) {
-            is DiscordSlashCommandContext -> {
-                println("Context is `DiscordSlashCommandContext`")
-                val args = commandContext.interaction.command.options
-
-                println("Command options: $args")
-
-                val option = args[name]
-
-                option?.value?.let { value ->
-                    println("Found option `$option` with value: `$value`")
-                    argumentType.tryParse(value, commandContext).getOrDefault(defaultValue)
-                }
-            }
-            else -> null
-        }
+        val value = commandContext.resolveRawArgumentValue(this)
 
         println("Resolved value: $value")
 
         if (value == null && required) {
-            commandContext.respond("Option `$name` is required and no default value is provided")
-            throw IllegalArgumentException("Option  `$name` is required and no default value is provided")
+            commandContext.respondError("Option `$name` is required and no default value is provided")
+            throw IllegalArgumentException("Option `$name` is required and no default value is provided")
         }
 
         return value

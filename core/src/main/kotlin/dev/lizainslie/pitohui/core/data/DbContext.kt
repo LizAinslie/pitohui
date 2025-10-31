@@ -1,4 +1,4 @@
-﻿package dev.lizainslie.pitohui.core.data
+package dev.lizainslie.pitohui.core.data
 
 import dev.lizainslie.pitohui.core.Bot
 import org.jetbrains.exposed.sql.Database
