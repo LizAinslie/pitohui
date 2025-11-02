@@ -45,3 +45,5 @@ bin/
 .DS_Store
 
 config.json
+root.example.d/bot.jar
+root.example.d/config/platforms/discord.json
