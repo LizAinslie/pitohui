@@ -20,7 +20,7 @@ object Configs {
 
 
     fun <T : Any> loadPlatformConfig(key: PlatformKey, serializer: KSerializer<T>): T {
-        val configFile = getPlatformsConfigDir().resolve(key.key)
+        val configFile = getPlatformsConfigDir().resolve("${key.key}.json")
         if (!configFile.exists()) {
             System.err.println("Config file ${configFile.absolutePath} does not exist, but platform ${key.key} is enabled. Please create the file and try again.")
             exitProcess(1)
