@@ -15,6 +15,18 @@ abstract class CommandContext(
     abstract suspend fun respond(text: String)
     abstract suspend fun respondPrivate(text: String)
     abstract suspend fun respondError(text: String)
+    open suspend fun respondException(e: Exception) {
+        respondStealth("""An exception has occurred while running this command: ${e.message}
+            |```kt
+            |${e.stackTraceToString()}
+            |```
+        """.trimMargin())
+    }
+
+    suspend fun respondStealth(text: String) {
+        if (callerIsStealth()) respondPrivate(text)
+        else respond(text)
+    }
 
     abstract fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T?
 
@@ -25,10 +37,12 @@ abstract class CommandContext(
     }
 
     suspend fun callerIsStealth() = newSuspendedTransaction {
-        DeveloperOptions.isUserStealth(callerId)
+        DeveloperOptions.getDeveloperOptions(callerId)?.stealth ?: false
     }
 
     val args = ArgumentMap(this)
+
+    abstract suspend fun dump()
 
     class ArgumentMap(private val context: CommandContext) {
         suspend operator fun <T> get(key: ArgumentDescriptor<T>): T? = key.resolve(context)

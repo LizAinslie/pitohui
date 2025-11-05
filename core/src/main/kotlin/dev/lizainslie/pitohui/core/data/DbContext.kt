@@ -5,14 +5,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DbContext(private val bot: Bot) {
-    private val db = Database.connect(
-        url = bot.config.db.url,
-        driver = "org.postgresql.Driver",
-        user = bot.config.db.user,
-        password = bot.config.db.password,
-    )
-
+object DbContext {
     val tables = mutableSetOf<Table>()
 
     fun generateMigrations(): List<String> =

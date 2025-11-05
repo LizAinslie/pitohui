@@ -2,21 +2,39 @@ package dev.lizainslie.pitohui.core
 
 import dev.lizainslie.pitohui.core.commands.Commands
 import dev.lizainslie.pitohui.core.config.BotConfig
+import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.data.DbContext
 import dev.lizainslie.pitohui.core.data.DeveloperOptionsTable
 import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import org.jetbrains.exposed.sql.Database
+import kotlin.system.exitProcess
 
-class Bot(
-    val config: BotConfig,
-) {
-    val db = DbContext(this).also {
-        it.tables += ModuleSwitchTable
-        it.tables += DeveloperOptionsTable
+class Bot {
+    val config: BotConfig
 
-        it.migrate()
+    init {
+        Configs.generateBaseStructure()
+
+        config = BotConfig.load()
+
+        if (!config.validate()) {
+            println("Main bot config invalid at ${Configs.getBotConfigFile().absolutePath}. Exiting.")
+            exitProcess(1)
+        }
+
+        Database.connect(
+            url = config.db.url,
+            driver = "org.postgresql.Driver",
+            user = config.db.user,
+            password = config.db.password,
+        )
+
+        DbContext.tables += ModuleSwitchTable
+        DbContext.tables += DeveloperOptionsTable
+        DbContext.migrate()
     }
 
     lateinit var commands: Commands
@@ -41,7 +59,7 @@ class Bot(
             throw IllegalArgumentException("Module with name ${module.name} already loaded")
         }
 
-        db.tables += module.tables
+        DbContext.tables += module.tables
 
         // check dependencies
         for (dependency in module.dependencies) {
@@ -65,7 +83,6 @@ class Bot(
             it.initialize(this)
         }
 
-
         for (module in modules) {
             module.onInit(this)
 
@@ -73,6 +90,8 @@ class Bot(
                 commands.registerCommand(command, module)
             }
         }
+
+        DbContext.migrate()
     }
 
     suspend fun start() {

@@ -27,6 +27,7 @@ include(":platforms:discord")
 include(":modules:system")
 include(":modules:admin")
 include(":modules:vcnotify")
+include(":modules:autorole")
 include(":modules:message-embedder")
 
 rootProject.name = "pitohui"

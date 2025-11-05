@@ -1,17 +1,20 @@
 package dev.lizainslie.pitohui.platforms.discord.commands
 
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.respondPublic
+import dev.kord.core.entity.Guild
 import dev.kord.core.entity.interaction.ChatInputCommandInteraction
 import dev.kord.rest.builder.message.create.InteractionResponseCreateBuilder
+import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
-import dev.lizainslie.pitohui.core.data.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import kotlinx.datetime.Clock
 
 class DiscordSlashCommandContext(
     bot: Bot,
@@ -43,21 +46,53 @@ class DiscordSlashCommandContext(
     }
 
     override fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
-        println("Context is `DiscordSlashCommandContext`")
-        val opts = interaction.command.options
+        val option = interaction.command.options[arg.name]
 
-        println("Command options: $opts")
-
-        val option = opts[arg.name]
-
-        return option?.value?.let { value ->
-            println("Found option `$option` with value: `$value`")
-            arg.argumentType.tryParse(value, this).getOrDefault(arg.defaultValue)
+        return option?.value?.let {
+            arg.argumentType.tryParse(it, this).getOrDefault(arg.defaultValue)
         }
     }
 
-    override val channelId: PlatformId = interaction.channelId.platform()
-    override val callerId: PlatformId = interaction.user.id.platform()
-    override val guildId: PlatformId? = interaction.invokedCommandGuildId?.platform()
+    override suspend fun dump() {
+        println("dumping context")
+        val stealth = callerIsStealth()
+
+        val guild = getGuild()
+        val channel = getChannel()
+
+        interaction.channel.createMessage {
+            embed {
+                title = "Context dumped!"
+                description = "Read fields below for details"
+                timestamp = Clock.System.now()
+
+                field("Is caller in stealth?", true) {
+                    if (stealth) "Yes" else "No"
+                }
+
+                field("Called from guild?", true) {
+                    if (isInGuild) "Yes" else "No"
+                }
+
+                field("", true)
+
+                if (isInGuild && guild != null) field("Guild", true) {
+                    "${guild.name} (ID: `${guild.id}`)"
+                }
+
+                if (channel != null) field("Channel", true) {
+                    "${channel.mention} (ID: `${channel.id}`)"
+                }
+
+                footer {
+                    text = "Pitohui v0.0.1-alpha.1"
+                }
+            }
+        }
+    }
+
+    override val channelId: PlatformId = interaction.channelId.platform
+    override val callerId: PlatformId = interaction.user.id.platform
+    override val guildId: PlatformId? = interaction.invokedCommandGuildId?.platform
     override val isInGuild: Boolean = interaction.invokedCommandGuildId != null
 }

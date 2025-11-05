@@ -1,3 +1,5 @@
+package dev.lizainslie.pitohui.modules.embed.data.tables
+
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 

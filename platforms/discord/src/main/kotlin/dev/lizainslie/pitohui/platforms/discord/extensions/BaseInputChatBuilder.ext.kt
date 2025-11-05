@@ -53,7 +53,6 @@ fun RootInputChatBuilder.subCommands(subCommands: List<SubCommand>) {
     subCommands.forEach { subCommand ->
         subCommand(subCommand.name, subCommand.description) {
             arguments(subCommand.arguments)
-
         }
     }
 }

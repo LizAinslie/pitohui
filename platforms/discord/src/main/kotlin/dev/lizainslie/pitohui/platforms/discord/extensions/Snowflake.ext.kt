@@ -4,7 +4,7 @@ import dev.kord.common.entity.Snowflake
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.Discord
 
-fun Snowflake.platform() = PlatformId(
+val Snowflake.platform get() = PlatformId(
     platform = Discord.key,
     id = value.toString()
 )

@@ -5,9 +5,9 @@ import dev.lizainslie.pitohui.core.data.DeveloperOptions
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
-val ToggleStealthCommand = defineCommand(
-    "toggle_stealth",
-    "Toggle stealth / vanish mode for bot developers"
+val DumpContextCommand = defineCommand(
+    "context_debug",
+    "Enable context debugging to dump the command context for inspection"
 ) {
     platforms(Discord)
 
@@ -16,9 +16,9 @@ val ToggleStealthCommand = defineCommand(
             val devOptions = DeveloperOptions.getDeveloperOptions(callerId)
                 ?: return@newSuspendedTransaction // exit silently if user isn't dev.
 
-            devOptions.stealth = !devOptions.stealth
+            devOptions.contextDebug = !devOptions.contextDebug
 
-            respondPrivate("Stealth mode is now `${if (devOptions.stealth) "on" else "off"}`.")
+            respondPrivate("Context debugging mode is now `${if (devOptions.contextDebug) "on" else "off"}`.")
         }
     }
 }

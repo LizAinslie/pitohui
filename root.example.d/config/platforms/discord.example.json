@@ -1,4 +1,12 @@
 {
   "token": "token",
-  "guilds": ["id", "id2"]
+  "guilds": [
+    {
+      "id": "some-id",
+      "admin": true
+    },
+    {
+      "id": "some-other-id"
+    }
+  ]
 }
