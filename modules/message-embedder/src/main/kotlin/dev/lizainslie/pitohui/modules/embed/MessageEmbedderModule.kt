@@ -9,14 +9,12 @@ import dev.lizainslie.pitohui.modules.system.SystemModule
 import dev.lizainslie.pitohui.platforms.discord.Discord
 
 @SupportPlatforms(Discord::class)
-object MessageEmbedderModule : AbstractModule() {
-    override val name = "message-embedder"
-    override val visibility = ModuleVisibility.MODERATOR
-    override val description = "Send embedded messages in communities."
-    override val commands = setOf<RootCommand>()
-    override val dependencies = setOf(SystemModule.name)
-
-    override val tables = setOf(
+object MessageEmbedderModule : AbstractModule(
+    "message-embedder",
+    description = "Send embedded messages in communities.",
+    visibility = ModuleVisibility.MODERATOR,
+    tables = setOf(
         EmbeddedMessageTable
-    )
-}
+    ),
+    dependencies = setOf(SystemModule.name)
+)

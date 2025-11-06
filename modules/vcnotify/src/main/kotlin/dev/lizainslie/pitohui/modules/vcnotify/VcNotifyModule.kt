@@ -13,24 +13,19 @@ import dev.lizainslie.pitohui.platforms.discord.Discord
 import org.jetbrains.exposed.sql.Table
 
 @SupportPlatforms(Discord::class)
-object VcNotifyModule : AbstractModule() {
-    override val optional = true
-    override val name = "vcnotify"
-    override val description = "Allows users to notify others when they join a voice channel, with a cooldown to prevent spam."
-    override val visibility = ModuleVisibility.PUBLIC
-
-    override val commands = setOf(
+object VcNotifyModule : AbstractModule(
+    "vcnotify",
+    description = "Allows users to notify others when they join a voice channel, with a cooldown to prevent spam.",
+    commands = setOf(
         VcNotifyCommand,
         VcNotifyAdminCommand
-    )
-
-    override val tables = setOf<Table>(
+    ),
+    tables = setOf(
         VcNotifySettingsTable,
-    )
-
-    override val dependencies = setOf(
+    ),
+    dependencies = setOf(
         SystemModule.name
     )
-
+) {
     val communitiesLastUsed = mutableMapOf<PlatformId, VcNotifyRecord>()
 }

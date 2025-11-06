@@ -10,14 +10,15 @@ import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 
-abstract class AbstractModule() {
-    abstract val name: String
-    open val optional = true
-    open val visibility = ModuleVisibility.PUBLIC
-    open val description: String = "No description provided"
-    open val commands: Set<RootCommand> = emptySet()
-    open val tables: Set<Table> = emptySet()
-    open val dependencies: Set<String> = emptySet()
+abstract class AbstractModule(
+    val name: String,
+    val optional: Boolean = true,
+    val visibility: ModuleVisibility = ModuleVisibility.PUBLIC,
+    val description: String = "No description provided",
+    val commands: Set<RootCommand> = emptySet(),
+    val tables: Set<Table> = emptySet(),
+    val dependencies: Set<String> = emptySet(),
+) {
     protected lateinit var bot: Bot
 
     open fun onLoad() {}

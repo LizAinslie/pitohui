@@ -15,19 +15,17 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 @SupportPlatforms(Discord::class)
-class AutoroleModule : AbstractModule() {
-    override val name = "autorole"
-    override val description = "Assign each new member a role upon joining the community"
-    override val visibility = ModuleVisibility.MODERATOR
-
-    override val commands = setOf(
+class AutoroleModule : AbstractModule(
+    "autorole",
+    description = "Assign each new member a role upon joining the community",
+    visibility = ModuleVisibility.MODERATOR,
+    commands = setOf(
         AutoroleCommand
-    )
-
-    override val tables = setOf(
+    ),
+    tables = setOf(
         AutoroleSettingsTable
     )
-
+) {
     override fun onLoad() {
         super.onLoad()
 

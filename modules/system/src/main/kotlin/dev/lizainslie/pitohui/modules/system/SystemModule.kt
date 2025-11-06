@@ -8,14 +8,14 @@ import dev.lizainslie.pitohui.modules.system.commands.ModuleCommand
 import dev.lizainslie.pitohui.platforms.discord.Discord
 
 @SupportPlatforms(Discord::class)
-object SystemModule : AbstractModule() {
-    override val optional = false
-    override val name = "system"
-    override val description = "Core functionality required for Pitohui to function"
-    override val commands = setOf(
+object SystemModule : AbstractModule(
+    "system",
+    description = "Core functionality required for Pitohui to function",
+    optional = false,
+    commands = setOf(
         AboutCommand,
         ModuleCommand,
     )
-
+) {
     override fun isEnabledForCommunity(communityId: PlatformId) = true
 }
