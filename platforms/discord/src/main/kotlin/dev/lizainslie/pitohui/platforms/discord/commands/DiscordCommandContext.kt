@@ -4,6 +4,7 @@ import dev.kord.common.Color
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.MessageChannel
+import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
@@ -32,26 +33,31 @@ abstract class DiscordCommandContext(
     suspend fun getCaller() = Discord.get().getUserById(callerId)
     suspend fun getChannel() = Discord.get().getChannelById(channelId)
 
-    suspend fun respond(block: UserMessageCreateBuilder.() -> Unit) {
+    open suspend fun respond(text: String = "", block: EmbedBuilder.() -> Unit) {
         val channel = getChannel() as MessageChannel
-        channel.createMessage(block)
+        channel.createMessage {
+            content = text
+            embed(block)
+        }
     }
 
-    suspend fun respondPrivate(block: UserMessageCreateBuilder.() -> Unit) {
+    open suspend fun respondPrivate(text: String = "", block: EmbedBuilder.() -> Unit) {
         val channel = getCaller()!!.getDmChannel()
-        channel.createMessage(block)
+        channel.createMessage {
+            content = text
+            embed(block)
+
+        }
     }
 
-    suspend fun respondStealth(block: UserMessageCreateBuilder.() -> Unit) {
-        if (callerIsStealth()) respondPrivate(block)
-        else respond(block)
+    suspend fun respondStealth(text: String = "", block: EmbedBuilder.() -> Unit) {
+        if (callerIsStealth()) respondPrivate(text, block)
+        else respond(text, block)
     }
 
     override suspend fun respondException(e: Exception) {
         respondStealth {
-            embed {
-                buildExceptionEmbed(e)
-            }
+            buildExceptionEmbed(e)
         }
     }
 

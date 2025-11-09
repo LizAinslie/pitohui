@@ -23,27 +23,25 @@ val AboutCommand = defineCommand(
         when (this) { // context is receiver
             is DiscordCommandContext -> {
                 respond {
-                    embed {
-                        title = "About Pitohui"
-                        description = BOT_DESCRIPTION
+                    title = "About Pitohui"
+                    description = BOT_DESCRIPTION
 
-                        thumbnail {
-                            url = thumbUrl
-                        }
+                    thumbnail {
+                        url = thumbUrl
+                    }
 
-                        // when customizing this, please leave the
-                        // original author and license fields intact or
-                        // link to the original project in some way <3
-                        field("Author", true) { "[Mey/Lizzy Ainslie](https://lizainslie.dev)" }
-                        field("Source Code", true) { "[Git](https://git.lizainslie.dev/mey/pitohui)" }
-                        field(
-                            "License",
-                            true
-                        ) { "[MIT](https://git.lizainslie.dev/mey/pitohui/-/raw/main/LICENSE)" }
+                    // when customizing this, please leave the
+                    // original author and license fields intact or
+                    // link to the original project in some way <3
+                    field("Author", true) { "[Mey/Lizzy Ainslie](https://lizainslie.dev)" }
+                    field("Source Code", true) { "[Git](https://git.lizainslie.dev/mey/pitohui)" }
+                    field(
+                        "License",
+                        true
+                    ) { "[MIT](https://git.lizainslie.dev/mey/pitohui/-/raw/main/LICENSE)" }
 
-                        footer {
-                            text = "Pitohui v0.0.1-alpha.1, receiving on Discord."
-                        }
+                    footer {
+                        text = "Pitohui v0.0.1-alpha.1, receiving on Discord."
                     }
                 }
             }

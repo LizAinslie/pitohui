@@ -78,21 +78,15 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                         return
                     }
 
-                    respond {
-                        content = settings.messageFormat
-                            .replace("{role}", role.mention)
-                            .replace("{user}", member.mention)
-                            .replace(
-                                "{channelLink}",
-                                "https://discord.com/channels/${communityId.id}/${voiceState.channelId!!.value}"
-                            )
-                            .replace("{channel}", channel.mention)
-
-                        allowedMentions {
-                            roles += role.id
-                            users += callerId.snowflake
-                        }
-                    }
+                    respond(settings.messageFormat
+                        .replace("{role}", role.mention)
+                        .replace("{user}", member.mention)
+                        .replace(
+                            "{channelLink}",
+                            "https://discord.com/channels/${communityId.id}/${voiceState.channelId!!.value}"
+                        )
+                        .replace("{channel}", channel.mention)
+                    )
                 }
 
                 if (lastUsedRecord != null) {

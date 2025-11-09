@@ -26,9 +26,8 @@ val VcNotifyAdminCommand = defineCommand("vcnotify_admin", "Admin commands for t
                 }
 
                 respondPrivate {
-                    embed {
-                        title = "VcNotify Documentation"
-                        description = """
+                    title = "VcNotify Documentation"
+                    description = """
 VcNotify is a module that allows users to notify others when they are in a voice channel.
 
 To set up VcNotify, you need to use the `/vcnotify_admin setrole` command to specify a role that will be notified when a user runs the main command.
@@ -36,8 +35,7 @@ To set up VcNotify, you need to use the `/vcnotify_admin setrole` command to spe
 If you want to customize the message format, you can run `/vcnotify_admin setformat <format>`, where `<format>` is the message you want to send. You can use `{role}` to mention the notification role, `{user}` to mention the user who ran the command, and `{channel}` to mention the voice channel they are in, or {channelLink} for a link to the channel instead (provides a nice embed). The default format is `{role} {user} is now in {channelLink}! Join them!`.
 
 To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`, where `<duration>` is the cooldown duration in minutes. The default cooldown is 30 minutes.
-                    """.trimIndent()
-                    }
+                """.trimIndent()
                 }
             }
         }

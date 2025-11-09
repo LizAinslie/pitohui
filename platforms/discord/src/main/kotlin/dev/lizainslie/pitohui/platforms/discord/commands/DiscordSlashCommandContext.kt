@@ -1,12 +1,10 @@
 package dev.lizainslie.pitohui.platforms.discord.commands
 
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.respondPublic
-import dev.kord.core.entity.Guild
 import dev.kord.core.entity.interaction.ChatInputCommandInteraction
-import dev.kord.rest.builder.message.create.InteractionResponseCreateBuilder
+import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
@@ -29,19 +27,29 @@ class DiscordSlashCommandContext(
         }
     }
 
-    suspend fun respond(builder: InteractionResponseCreateBuilder.() -> Unit) = interaction.respondPublic(builder)
-
     override suspend fun respondPrivate(text: String) {
         interaction.respondEphemeral {
             content = text
         }
     }
 
-    suspend fun respondPrivate(builder: InteractionResponseCreateBuilder.() -> Unit) = interaction.respondEphemeral(builder)
-
     override suspend fun respondError(text: String) {
         interaction.respondEphemeral {
             content = text
+        }
+    }
+
+    override suspend fun respond(text: String, block: EmbedBuilder.() -> Unit) {
+        interaction.respondPublic {
+            content = text
+            embed(block)
+        }
+    }
+
+    override suspend fun respondPrivate(text: String, block: EmbedBuilder.() -> Unit) {
+        interaction.respondEphemeral {
+            content = text
+            embed(block)
         }
     }
 

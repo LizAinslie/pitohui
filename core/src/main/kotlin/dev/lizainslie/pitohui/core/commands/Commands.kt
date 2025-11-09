@@ -4,9 +4,8 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.data.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.UnsupportedPlatformException
-import jdk.tools.jlink.internal.Platform
+
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 class Commands(
