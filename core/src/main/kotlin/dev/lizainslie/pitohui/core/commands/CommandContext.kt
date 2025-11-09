@@ -31,6 +31,7 @@ abstract class CommandContext(
     abstract fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T?
 
     abstract val callerId: PlatformId
+    abstract val communityId: PlatformId?
 
     suspend fun callerIsDeveloper() = newSuspendedTransaction {
         DeveloperOptions.isUserDeveloper(callerId)

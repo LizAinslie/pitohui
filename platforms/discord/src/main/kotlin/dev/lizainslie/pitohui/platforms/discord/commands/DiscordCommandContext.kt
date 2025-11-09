@@ -1,11 +1,11 @@
 package dev.lizainslie.pitohui.platforms.discord.commands
 
-import dev.kord.common.Color
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.rest.builder.message.EmbedBuilder
-import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.CommandContext
@@ -14,7 +14,6 @@ import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
-import kotlinx.datetime.Clock
 
 abstract class DiscordCommandContext(
     bot: Bot,
@@ -25,6 +24,8 @@ abstract class DiscordCommandContext(
     abstract val guildId: PlatformId?
     abstract val isInGuild: Boolean
 
+    override val communityId = guildId
+
     suspend fun getGuild() = guildId?.let {
         Discord.get().getGuildById(it)
     }
@@ -32,6 +33,42 @@ abstract class DiscordCommandContext(
     suspend fun getMember() = getGuild()?.getMember(callerId.snowflake)
     suspend fun getCaller() = Discord.get().getUserById(callerId)
     suspend fun getChannel() = Discord.get().getChannelById(channelId)
+
+    suspend fun checkCallerPermission(permissions: Permission): Boolean {
+        if (!isInGuild) return false
+
+//        println("in guild")
+
+        val member = getMember() ?: return false
+
+//        println(member.toString())
+
+        val perms = member.getPermissions()
+
+//        println("Caller permissions: ${perms.values.joinToString(", ") {
+//            perm -> perm.toString()
+//        }}")
+
+        return perms.contains(permissions)
+    }
+
+    suspend fun checkCallerPermission(permissions: Permissions): Boolean {
+        if (!isInGuild) return false
+
+//        println("in guild")
+
+        val member = getMember() ?: return false
+
+//        println(member.toString())
+
+        val perms = member.getPermissions()
+
+//        println("Caller permissions: ${perms.values.joinToString(", ") {
+//            perm -> perm.toString()
+//        }}")
+
+        return perms.contains(permissions)
+    }
 
     open suspend fun respond(text: String = "", block: EmbedBuilder.() -> Unit) {
         val channel = getChannel() as MessageChannel
@@ -46,7 +83,6 @@ abstract class DiscordCommandContext(
         channel.createMessage {
             content = text
             embed(block)
-
         }
     }
 

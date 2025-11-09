@@ -1,13 +1,13 @@
 package dev.lizainslie.pitohui.modules.vcnotify.commands
 
-import dev.kord.rest.builder.message.embed
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.system.commands.checkManagementPermission
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
@@ -20,11 +20,6 @@ val VcNotifyAdminCommand = defineCommand("vcnotify_admin", "Admin commands for t
     subCommand("info", "Documentation for VcNotify") {
         handle {
             enforceDiscord<DiscordCommandContext> {
-                if (!checkManagementPermission()) {
-                    respondError("You do not have permission to manage VcNotify settings.")
-                    return@handle
-                }
-
                 respondPrivate {
                     title = "VcNotify Documentation"
                     description = """
@@ -35,7 +30,7 @@ To set up VcNotify, you need to use the `/vcnotify_admin setrole` command to spe
 If you want to customize the message format, you can run `/vcnotify_admin setformat <format>`, where `<format>` is the message you want to send. You can use `{role}` to mention the notification role, `{user}` to mention the user who ran the command, and `{channel}` to mention the voice channel they are in, or {channelLink} for a link to the channel instead (provides a nice embed). The default format is `{role} {user} is now in {channelLink}! Join them!`.
 
 To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`, where `<duration>` is the cooldown duration in minutes. The default cooldown is 30 minutes.
-                """.trimIndent()
+                    """.trimIndent()
                 }
             }
         }
@@ -47,7 +42,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         handle {
             enforceDiscord<DiscordCommandContext> {
                 enforceGuild { guild ->
-                    if (!checkManagementPermission()) {
+                    if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
                         return@enforceGuild
                     }
@@ -86,7 +81,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         handle {
             enforceDiscord<DiscordCommandContext> {
                 enforceGuild { guild ->
-                    if (!checkManagementPermission()) {
+                    if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
                         return@enforceGuild
                     }
@@ -116,7 +111,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         handle {
             enforceDiscord<DiscordCommandContext> {
                 enforceGuild { guild ->
-                    if (!checkManagementPermission()) {
+                    if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
                         return@enforceGuild
                     }

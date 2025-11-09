@@ -4,16 +4,14 @@ import dev.kord.common.entity.Permission
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.core.data.ModuleSwitch
 import dev.lizainslie.pitohui.platforms.discord.Discord
+import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 suspend fun CommandContext.checkManagementPermission(): Boolean {
     return when (this) {
-        is DiscordSlashCommandContext -> {
-            getMember()?.permissions?.contains(Permission.ManageGuild) ?: false
-        }
+        is DiscordCommandContext -> checkCallerPermission(Permission.ManageGuild)
 
         else -> false
     }
@@ -45,7 +43,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
                 }
 
                 val communityId = when (this) {
-                    is DiscordSlashCommandContext -> {
+                    is DiscordCommandContext -> {
                         if (isInGuild) guildId!!
                         else {
                             respondError("This command must be used in a community.")
@@ -106,7 +104,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
                 }
 
                 val communityId = when (this) {
-                    is DiscordSlashCommandContext -> {
+                    is DiscordCommandContext -> {
                         if (isInGuild) guildId!!
                         else {
                             respondError("This command can only be used in a server.")
