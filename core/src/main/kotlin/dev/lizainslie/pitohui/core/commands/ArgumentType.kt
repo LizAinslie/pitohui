@@ -7,7 +7,7 @@ interface ArgumentType<out T> {
 
     fun tryParse(value: Any, context: CommandContext) =
         try {
-            println("Parsing value: $value on platform: ${context.platform} of type: ${value::class.simpleName} for ${this::class.simpleName}")
+            println("Parsing value: `$value` on platform ${context.platform.key} of value type ${value::class.simpleName} for ArgumentType.${this::class.simpleName}")
             Result.success(parse(value, context))
         } catch (e: Exception) {
             Result.failure(e)
@@ -40,7 +40,7 @@ object ArgumentTypes {
 
     }
 
-    object ROLE : ArgumentType<PlatformId> { // FIXME: this is shit but will get polished
+    object ROLE : ArgumentType<PlatformId> {
         override fun parse(value: Any, context: CommandContext): PlatformId =
             context.platform.get().roleArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support ROLE arguments.")

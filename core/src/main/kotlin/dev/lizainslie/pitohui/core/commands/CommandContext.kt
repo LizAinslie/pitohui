@@ -33,6 +33,11 @@ abstract class CommandContext(
     abstract val callerId: PlatformId
     abstract val communityId: PlatformId?
 
+    // we use `get()` here because with a simple assignment, the expression
+    // will always evaluate to `false` even if the value of `communityId` is not
+    // `null`
+    val isInCommunity get() = communityId != null
+
     suspend fun callerIsDeveloper() = newSuspendedTransaction {
         DeveloperOptions.isUserDeveloper(callerId)
     }

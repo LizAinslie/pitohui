@@ -25,56 +25,42 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
             argument("module_name", "The name of the module to enable", ArgumentTypes.STRING, required = true)
 
         handle {
-            val moduleName = args[moduleNameArg]
-            if (moduleName != null) {
-                val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
-                    respondError("Module **$moduleName** does not exist.")
-                    return@handle
-                }
+            val moduleName = args[moduleNameArg]!!.lowercase()
 
-                if (!checkManagementPermission()) {
-                    respondError("You do not have permission to manage modules in this community.")
-                    return@handle
-                }
-
-                if (!module.optional) {
-                    respondError("Module **${module.name}** cannot be toggled.")
-                    return@handle
-                }
-
-                val communityId = when (this) {
-                    is DiscordCommandContext -> {
-                        if (isInGuild) guildId!!
-                        else {
-                            respondError("This command must be used in a community.")
-                            return@handle
-                        }
-                    }
-
-                    else -> {
-                        respondError("This command is not supported on this platform.")
-                        return@handle
-                    }
-                }
-
-                newSuspendedTransaction {
-                    val moduleSwitch = ModuleSwitch.getSwitch(communityId, module.name)
-
-                    if (moduleSwitch != null) {
-                        if (moduleSwitch.enabled) {
-                            respondPrivate("Module **${module.name}** is already enabled.")
-                            return@newSuspendedTransaction
-                        } else {
-                            moduleSwitch.enabled = true
-                        }
-                    } else
-                        ModuleSwitch.createSwitch(communityId, module.name, enabled = true)
-
-                    respondPrivate("Module **${module.name}** has been enabled.")
-                }
-            } else {
-                respondError("Please provide a valid module name to enable.")
+            val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
+                respondError("Module **$moduleName** does not exist.")
+                return@handle
             }
+
+            if (!checkManagementPermission()) {
+                respondError("You do not have permission to manage modules in this community.")
+                return@handle
+            }
+
+            if (!module.optional) {
+                respondError("Module **${module.name}** cannot be toggled.")
+                return@handle
+            }
+
+            if (!isInCommunity) {
+                respondError("This command must be used in a community.")
+                return@handle
+            }
+
+            newSuspendedTransaction {
+                ModuleSwitch.getSwitch(
+                    communityId!!,
+                    module.name
+                )?.also {
+                    it.enabled = true
+                } ?: ModuleSwitch.createSwitch(
+                    communityId!!,
+                    module.name,
+                    true
+                )
+            }
+
+            respondPrivate("Module **${module.name}** has been enabled.")
         }
     }
 
@@ -83,59 +69,42 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
             argument("module_name", "The name of the module to disable", ArgumentTypes.STRING, required = true)
 
         handle {
-            val moduleName = args[moduleNameArg]
-            if (moduleName != null) {
+            val moduleName = args[moduleNameArg]!!.lowercase()
 
-                // todo: abstract this into a function
-
-                val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
-                    respondError("Module **$moduleName** does not exist.")
-                    return@handle
-                }
-
-                if (!checkManagementPermission()) {
-                    respondError("You do not have permission to manage modules in this community.")
-                    return@handle
-                }
-
-                if (!module.optional) {
-                    respondError("Module **${module.name}** cannot be toggled.")
-                    return@handle
-                }
-
-                val communityId = when (this) {
-                    is DiscordCommandContext -> {
-                        if (isInGuild) guildId!!
-                        else {
-                            respondError("This command can only be used in a server.")
-                            return@handle
-                        }
-                    }
-
-                    else -> {
-                        respondError("This command is not supported on this platform.")
-                        return@handle
-                    }
-                }
-
-                newSuspendedTransaction {
-                    val moduleSwitch = ModuleSwitch.getSwitch(communityId, module.name)
-                    if (moduleSwitch != null) {
-                        if (!moduleSwitch.enabled) {
-                            respondPrivate("Module **${module.name}** is already disabled.")
-                            return@newSuspendedTransaction
-                        } else {
-                            moduleSwitch.enabled = false
-                        }
-                    } else {
-                        ModuleSwitch.createSwitch(communityId, module.name, enabled = false)
-                    }
-
-                    respondPrivate("Module **${module.name}** has been disabled.")
-                }
-            } else {
-                respondError("Please provide a valid module name to disable.")
+            val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
+                respondError("Module **$moduleName** does not exist.")
+                return@handle
             }
+
+            if (!checkManagementPermission()) {
+                respondError("You do not have permission to manage modules in this community.")
+                return@handle
+            }
+
+            if (!module.optional) {
+                respondError("Module **${module.name}** cannot be toggled.")
+                return@handle
+            }
+
+            if (!isInCommunity) {
+                respondError("This command must be used in a community.")
+                return@handle
+            }
+
+            newSuspendedTransaction {
+                ModuleSwitch.getSwitch(
+                    communityId!!,
+                    module.name
+                )?.also {
+                    it.enabled = false
+                } ?: ModuleSwitch.createSwitch(
+                    communityId!!,
+                    module.name,
+                    false
+                )
+            }
+
+            respondPrivate("Module **${module.name}** has been disabled.")
         }
     }
 }

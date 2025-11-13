@@ -1,10 +1,8 @@
 package dev.lizainslie.pitohui.modules.vcnotify.commands
 
 import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Permissions
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.modules.system.commands.checkManagementPermission
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext

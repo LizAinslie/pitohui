@@ -24,7 +24,9 @@ abstract class DiscordCommandContext(
     abstract val guildId: PlatformId?
     abstract val isInGuild: Boolean
 
-    override val communityId = guildId
+    // we use `get()` here because we need a functional getter otherwise it
+    // evaluates to `null` even if the value of `guildId` is not `null`
+    final override val communityId get() = guildId
 
     suspend fun getGuild() = guildId?.let {
         Discord.get().getGuildById(it)
@@ -36,37 +38,15 @@ abstract class DiscordCommandContext(
 
     suspend fun checkCallerPermission(permissions: Permission): Boolean {
         if (!isInGuild) return false
-
-//        println("in guild")
-
         val member = getMember() ?: return false
-
-//        println(member.toString())
-
         val perms = member.getPermissions()
-
-//        println("Caller permissions: ${perms.values.joinToString(", ") {
-//            perm -> perm.toString()
-//        }}")
-
         return perms.contains(permissions)
     }
 
     suspend fun checkCallerPermission(permissions: Permissions): Boolean {
         if (!isInGuild) return false
-
-//        println("in guild")
-
         val member = getMember() ?: return false
-
-//        println(member.toString())
-
         val perms = member.getPermissions()
-
-//        println("Caller permissions: ${perms.values.joinToString(", ") {
-//            perm -> perm.toString()
-//        }}")
-
         return perms.contains(permissions)
     }
 

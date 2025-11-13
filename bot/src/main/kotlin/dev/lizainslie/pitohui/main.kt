@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.command.main
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.modules.admin.AdminModule
+import dev.lizainslie.pitohui.modules.autorole.AutoroleModule
 import dev.lizainslie.pitohui.modules.system.SystemModule
 import dev.lizainslie.pitohui.modules.vcnotify.VcNotifyModule
 import dev.lizainslie.pitohui.modules.embed.MessageEmbedderModule
@@ -19,6 +20,7 @@ class PitohuiBot : SuspendingCliktCommand() {
         bot.loadModule(AdminModule)
         bot.loadModule(VcNotifyModule)
         bot.loadModule(MessageEmbedderModule)
+        bot.loadModule(AutoroleModule)
 
         bot.init()
         bot.start()

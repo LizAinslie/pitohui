@@ -103,4 +103,8 @@ class DiscordSlashCommandContext(
     override val callerId: PlatformId = interaction.user.id.platform
     override val guildId: PlatformId? = interaction.invokedCommandGuildId?.platform
     override val isInGuild: Boolean = interaction.invokedCommandGuildId != null
+
+//    init {
+//        println("community id: $communityId, in community? $isInCommunity, caller id: $callerId, guild id: $guildId, channel id: $channelId")
+//    }
 }
