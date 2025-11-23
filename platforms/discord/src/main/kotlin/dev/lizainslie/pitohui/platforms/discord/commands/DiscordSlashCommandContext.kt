@@ -9,7 +9,6 @@ import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import kotlinx.datetime.Clock

@@ -35,14 +35,14 @@ object ArgumentTypes {
 
     object CHANNEL : ArgumentType<PlatformId> {
         override fun parse(value: Any, context: CommandContext): PlatformId =
-            context.platform.get().channelArgumentParser?.parse(value) ?:
+            context.platform.channelArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support CHANNEL arguments.")
 
     }
 
     object ROLE : ArgumentType<PlatformId> {
         override fun parse(value: Any, context: CommandContext): PlatformId =
-            context.platform.get().roleArgumentParser?.parse(value) ?:
+            context.platform.roleArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support ROLE arguments.")
     }
 }

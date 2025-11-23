@@ -12,12 +12,10 @@ import dev.lizainslie.pitohui.platforms.discord.Discord
 
 class PitohuiBot : SuspendingCliktCommand() {
     override suspend fun run() {
-        val bot = Bot()
+        val bot = Bot(SystemModule, AdminModule)
 
         bot.enablePlatforms(Discord)
 
-        bot.loadModule(SystemModule)
-        bot.loadModule(AdminModule)
         bot.loadModule(VcNotifyModule)
         bot.loadModule(MessageEmbedderModule)
         bot.loadModule(AutoroleModule)

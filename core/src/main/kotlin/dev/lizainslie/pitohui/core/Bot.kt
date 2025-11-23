@@ -8,9 +8,8 @@ import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 
-class Bot {
+class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
     init {
         // generate the base folder structure if it doesn't exist
         BotFS.generateBaseStructure()
@@ -22,14 +21,16 @@ class Bot {
         DbContext.tables += ModuleSwitchTable
         DbContext.tables += DeveloperOptionsTable
         DbContext.migrate()
+
+        baseModules.forEach(::loadModule)
     }
 
     lateinit var commands: Commands
 
     val modules = mutableListOf<AbstractModule>()
-    val platformAdapters = mutableListOf<PlatformAdapterFactory<*>>()
+    val platformAdapters = mutableListOf<PlatformAdapter>()
 
-    fun enablePlatforms(vararg platforms: PlatformAdapterFactory<*>) {
+    fun enablePlatforms(vararg platforms: PlatformAdapter) {
         platforms.forEach { adapter ->
             if (platformAdapters.none { it.key == adapter.key }) platformAdapters.add(adapter)
         }
@@ -37,7 +38,25 @@ class Bot {
 
     suspend fun eachPlatform(block: suspend (platformAdapter: PlatformAdapter) -> Unit) {
         for (platform in platformAdapters) {
-            block(platform.get())
+            block(platform)
+        }
+    }
+
+    private fun checkModuleDependencies(module: AbstractModule) {
+        // check dependencies
+        for (dependency in module.dependencies) {
+            if (modules.none { it.name == dependency }) {
+                throw IllegalArgumentException("Module ${module.name} depends on module $dependency, which is not loaded")
+            }
+        }
+    }
+
+    fun unloadModule(module: AbstractModule, force: Boolean = false) {
+        for (possiblyDependent in modules) {
+            if (module.name in possiblyDependent.dependencies) {
+                if (!force) // todo branch for warning
+                    throw IllegalStateException("Module ${module.name} is required by ${possiblyDependent.name} and cannot be unloaded")
+            }
         }
     }
 
@@ -47,13 +66,9 @@ class Bot {
         }
 
         DbContext.tables += module.tables
+        DbContext.migrate(module.tables)
 
-        // check dependencies
-        for (dependency in module.dependencies) {
-            if (modules.none { it.name == dependency }) {
-                throw IllegalArgumentException("Module ${module.name} depends on module $dependency, which is not loaded")
-            }
-        }
+        checkModuleDependencies(module)
 
         modules += module
         module.onLoad()
@@ -61,10 +76,6 @@ class Bot {
 
     suspend fun init() {
         commands = Commands(this)
-
-        platformAdapters.forEach {
-            it.load()
-        }
 
         eachPlatform {
             it.initialize(this)
@@ -77,8 +88,6 @@ class Bot {
                 commands.registerCommand(command, module)
             }
         }
-
-        DbContext.migrate()
     }
 
     suspend fun start() {

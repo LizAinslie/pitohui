@@ -3,14 +3,14 @@ package dev.lizainslie.pitohui.core.commands
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.data.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 abstract class CommandContext(
     val bot: Bot,
     val module: AbstractModule,
-    val platform: PlatformAdapterFactory<*>,
+    val platform: PlatformAdapter,
 ) {
     abstract suspend fun respond(text: String)
     abstract suspend fun respondPrivate(text: String)

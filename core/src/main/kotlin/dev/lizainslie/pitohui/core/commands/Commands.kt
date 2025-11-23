@@ -15,7 +15,12 @@ class Commands(
 
     suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
         commands.add(CommandRegistration(command, module))
-        bot.eachPlatform { it.registerCommand(command, module) }
+
+        bot.eachPlatform {
+            if (module.supportsPlatform(it)
+                && command.supportsPlatform(it))
+                it.registerCommand(command, module)
+        }
     }
 
     fun getRegistration(commandName: String): CommandRegistration? =

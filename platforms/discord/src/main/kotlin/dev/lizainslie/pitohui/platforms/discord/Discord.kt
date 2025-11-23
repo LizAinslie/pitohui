@@ -23,7 +23,6 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import dev.lizainslie.pitohui.platforms.discord.config.DiscordPlatformConfig
@@ -33,7 +32,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.collections.find
 
-class Discord : PlatformAdapter(key, "Discord") {
+object Discord : PlatformAdapter(
+    key = PlatformKey("discord"),
+    displayName = "Discord"
+) {
     val config by Configs.config<DiscordPlatformConfig>()
 
     lateinit var kord: Kord
@@ -183,11 +185,5 @@ class Discord : PlatformAdapter(key, "Discord") {
             module = registration.module,
             interaction = interaction,
         ))
-    }
-
-    companion object : PlatformAdapterFactory<Discord>() {
-        override fun initialize() = Discord()
-        override val key = PlatformKey("discord")
-        override val platformClass = Discord::class
     }
 }

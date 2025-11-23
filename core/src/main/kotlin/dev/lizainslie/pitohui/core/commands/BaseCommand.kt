@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.core.commands
 
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 
 abstract class BaseCommand(
@@ -14,9 +14,12 @@ abstract class BaseCommand(
 
     abstract suspend fun handle(context: CommandContext)
 
-    fun supportsPlatform(platform: PlatformAdapterFactory<*>) =
+    fun supportsPlatform(key: PlatformKey) =
         if (platforms.isEmpty()) true
-        else platforms.contains(platform.key)
+        else platforms.contains(key)
+
+    fun supportsPlatform(platform: PlatformAdapter) =
+        supportsPlatform(platform.key)
 }
 
 abstract class RootCommand(

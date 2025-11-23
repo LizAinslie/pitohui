@@ -10,7 +10,6 @@ import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
@@ -28,12 +27,12 @@ abstract class DiscordCommandContext(
     final override val communityId get() = guildId
 
     suspend fun getGuild() = guildId?.let {
-        Discord.get().getGuildById(it)
+        Discord.getGuildById(it)
     }
 
     suspend fun getMember() = getGuild()?.getMember(callerId.snowflake)
-    suspend fun getCaller() = Discord.get().getUserById(callerId)
-    suspend fun getChannel() = Discord.get().getChannelById(channelId)
+    suspend fun getCaller() = Discord.getUserById(callerId)
+    suspend fun getChannel() = Discord.getChannelById(channelId)
 
     suspend fun checkCallerPermission(permissions: Permission): Boolean {
         if (!isInGuild) return false

@@ -19,10 +19,10 @@ object DbContext {
         )
     }
 
-    fun generateMigrations(): List<String> =
+    fun generateMigrations(tablesToMigrate: Set<Table> = tables): List<String> =
         transaction {
             val allStatements =
-                MigrationUtils.statementsRequiredForDatabaseMigration(*tables.toTypedArray(), withLogs = true)
+                MigrationUtils.statementsRequiredForDatabaseMigration(*tablesToMigrate.toTypedArray(), withLogs = true)
 
             val migrationScripts = mutableListOf<String>()
 
@@ -37,8 +37,8 @@ object DbContext {
             migrationScripts
         }
 
-    fun migrate() {
-        val migrations = generateMigrations()
+    fun migrate(tablesToMigrate: Set<Table> = tables) {
+        val migrations = generateMigrations(tablesToMigrate)
         transaction {
             migrations.forEach { statement ->
                 // Execute each statement

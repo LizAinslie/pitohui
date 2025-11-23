@@ -28,7 +28,7 @@ object AutoroleModule : AbstractModule(
     override fun onInit(bot: Bot) {
         super.onInit(bot)
 
-        Discord.get().addEventListener<MemberJoinEvent> {
+        Discord.addEventListener<MemberJoinEvent> {
             val communityId = guildId.platform
 
             println("new member joined $communityId. bot? ${member.isBot}")

@@ -1,8 +1,8 @@
 package dev.lizainslie.pitohui.core.platforms
 
 class UnsupportedPlatformException(
-    val currentPlatform: PlatformAdapterFactory<*>,
-    vararg val allowedPlatforms: PlatformAdapterFactory<*>
+    val currentPlatform: PlatformAdapter,
+    vararg val allowedPlatforms: PlatformAdapter
 ) : Exception(
     "Unsupported platform ${currentPlatform.displayName}. Allowed platforms: ${allowedPlatforms.joinToString(", ") { it.displayName }}."
 )

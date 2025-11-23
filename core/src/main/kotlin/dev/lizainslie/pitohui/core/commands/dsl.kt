@@ -1,8 +1,7 @@
 package dev.lizainslie.pitohui.core.commands
 
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
+import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
-import dev.lizainslie.pitohui.core.platforms.Platforms
 
 open class BaseCommandDsl(
     val name: String,
@@ -13,7 +12,7 @@ open class BaseCommandDsl(
     protected val platforms = mutableSetOf<PlatformKey>()
     protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
 
-    fun platforms(vararg platforms: PlatformAdapterFactory<*>) {
+    fun platforms(vararg platforms: PlatformAdapter) {
         this.platforms.addAll(platforms.map { it.key })
     }
 
