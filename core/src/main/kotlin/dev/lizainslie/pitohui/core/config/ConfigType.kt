@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.core.config
 
-enum class ConfigLocationType {
+enum class ConfigType {
     ROOT,
     PLATFORM,
     MODULE,
