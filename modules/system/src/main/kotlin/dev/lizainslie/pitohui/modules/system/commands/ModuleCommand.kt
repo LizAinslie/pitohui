@@ -5,6 +5,8 @@ import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.data.ModuleSwitch
+import dev.lizainslie.pitohui.core.modules.AbstractModule
+import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -17,8 +19,53 @@ suspend fun CommandContext.checkManagementPermission(): Boolean {
     }
 }
 
+fun buildModuleDescription(module: AbstractModule, context: CommandContext, supportsMarkdown: Boolean = true): String {
+    var description = module.description
+
+    if (!module.optional) description += "\n-# *This module is not optional and enabled in every community.*"
+
+    if (context.isInCommunity) {
+        description += "\n${if (supportsMarkdown) "**" else ""}Enabled:${if (supportsMarkdown) "**" else ""} ${if (module.isEnabledForCommunity(context.communityId!!)) "yes" else "no"}"
+    }
+
+    return description
+}
+
+suspend fun shouldListModule(module: AbstractModule, context: CommandContext) = when(module.visibility) {
+    ModuleVisibility.DEVELOPER -> false
+    ModuleVisibility.PUBLIC -> true
+    ModuleVisibility.MODERATOR -> {
+        when (context) {
+            is DiscordCommandContext -> context.checkCallerPermission(Permission.ManageGuild) // todo: change this to a more robust role-based system
+            else -> false
+        }
+    }
+}
+
 val ModuleCommand = defineCommand("module", "Manage modules") {
     platforms(Discord)
+
+    subCommand("list", "List all modules") {
+        handle {
+            val modules = bot.modules.filter {
+                shouldListModule(it, this@handle)
+            }
+
+            if (this is DiscordCommandContext) {
+                respond {
+                    title = "Pitohui Bot Modules"
+
+                    description = "Below are modules that are available on this bot, their descriptions, and whether or not they're enabled."
+
+                    modules.forEach { module ->
+                        field(module.name, inline = false) {
+                            buildModuleDescription(module, this@handle)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     subCommand("enable", "Enable a module") {
         val moduleNameArg =

@@ -2,6 +2,8 @@ package dev.lizainslie.pitohui.core.modules
 
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.RootCommand
+import dev.lizainslie.pitohui.core.config.ConfigBase
+import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.data.ModuleSwitch
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapterFactory
 import dev.lizainslie.pitohui.core.platforms.PlatformId
@@ -26,11 +28,14 @@ abstract class AbstractModule(
         this.bot = bot
     }
 
+    inline fun <reified TConfig : ConfigBase> config() =
+        Configs.moduleConfig<TConfig>(this.name)
+
     open fun isEnabledForCommunity(communityId: PlatformId) = transaction {
         supportsPlatform(communityId.platform) && ModuleSwitch.isModuleEnabled(communityId, name)
     }
 
-    fun supportsPlatform(platform: PlatformAdapterFactory<*, *>) =
+    fun supportsPlatform(platform: PlatformAdapterFactory<*>) =
         this::class.annotations.filterIsInstance<SupportPlatforms>().any {
             it.platforms.contains(platform.platformClass)
         }

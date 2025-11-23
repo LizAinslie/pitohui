@@ -14,7 +14,7 @@ abstract class BaseCommand(
 
     abstract suspend fun handle(context: CommandContext)
 
-    fun supportsPlatform(platform: PlatformAdapterFactory<*, *>) =
+    fun supportsPlatform(platform: PlatformAdapterFactory<*>) =
         if (platforms.isEmpty()) true
         else platforms.contains(platform.key)
 }

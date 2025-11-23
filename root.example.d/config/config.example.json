@@ -1,7 +1,0 @@
-{
-  "db": {
-    "url": "jdbc:postgresql://db:5432/pitohui",
-    "user": "pitohui",
-    "password": "pitohui"
-  }
-}

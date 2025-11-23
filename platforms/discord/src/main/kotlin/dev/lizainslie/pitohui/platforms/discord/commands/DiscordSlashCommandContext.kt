@@ -17,10 +17,9 @@ import kotlinx.datetime.Clock
 class DiscordSlashCommandContext(
     bot: Bot,
     module: AbstractModule,
-    platform: PlatformAdapterFactory<*, *>,
 
     val interaction: ChatInputCommandInteraction
-) : DiscordCommandContext(bot, module, platform) {
+) : DiscordCommandContext(bot, module) {
     override suspend fun respond(text: String) {
         interaction.respondPublic {
             content = text

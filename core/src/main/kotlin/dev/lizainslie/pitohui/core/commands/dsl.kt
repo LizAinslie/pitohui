@@ -13,7 +13,7 @@ open class BaseCommandDsl(
     protected val platforms = mutableSetOf<PlatformKey>()
     protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
 
-    fun platforms(vararg platforms: PlatformAdapterFactory<*, *>) {
+    fun platforms(vararg platforms: PlatformAdapterFactory<*>) {
         this.platforms.addAll(platforms.map { it.key })
     }
 

@@ -18,8 +18,7 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 abstract class DiscordCommandContext(
     bot: Bot,
     module: AbstractModule,
-    platform: PlatformAdapterFactory<*, *>,
-) : CommandContext(bot, module, platform) {
+) : CommandContext(bot, module, Discord) {
     abstract val channelId: PlatformId
     abstract val guildId: PlatformId?
     abstract val isInGuild: Boolean
