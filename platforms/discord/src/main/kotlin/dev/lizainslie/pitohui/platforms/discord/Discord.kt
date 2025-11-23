@@ -16,6 +16,7 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.BaseCommand
 import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
+import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
@@ -32,7 +33,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.collections.find
 
-class Discord(config: DiscordPlatformConfig) : PlatformAdapter<DiscordPlatformConfig>(config, key, "Discord") {
+class Discord : PlatformAdapter(key, "Discord") {
+    val config by Configs.config<DiscordPlatformConfig>()
+
     lateinit var kord: Kord
 
     override val channelArgumentParser =
@@ -178,16 +181,13 @@ class Discord(config: DiscordPlatformConfig) : PlatformAdapter<DiscordPlatformCo
         bot.commands.dispatchCommand(handlingCommand, DiscordSlashCommandContext(
             bot = bot,
             module = registration.module,
-            platform = Discord,
             interaction = interaction,
         ))
     }
 
-    companion object : PlatformAdapterFactory<DiscordPlatformConfig, Discord>() {
+    companion object : PlatformAdapterFactory<Discord>() {
+        override fun initialize() = Discord()
         override val key = PlatformKey("discord")
-        override val configSerializer = DiscordPlatformConfig.serializer()
         override val platformClass = Discord::class
-        override fun initialize(config: DiscordPlatformConfig) = Discord(config)
-        override fun createDefaultConfig() = DiscordPlatformConfig()
     }
 }

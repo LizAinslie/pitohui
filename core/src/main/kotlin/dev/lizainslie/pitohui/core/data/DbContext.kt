@@ -1,12 +1,23 @@
 package dev.lizainslie.pitohui.core.data
 
-import dev.lizainslie.pitohui.core.Bot
+import dev.lizainslie.pitohui.core.config.Configs
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object DbContext {
+    val config by Configs.config<DatabaseConfig>()
+
     val tables = mutableSetOf<Table>()
+
+    fun connect() {
+        Database.connect(
+            url = config.url,
+            driver = "org.postgresql.Driver",
+            user = config.user,
+            password = config.password,
+        )
+    }
 
     fun generateMigrations(): List<String> =
         transaction {

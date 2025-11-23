@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 abstract class CommandContext(
     val bot: Bot,
     val module: AbstractModule,
-    val platform: PlatformAdapterFactory<*, *>,
+    val platform: PlatformAdapterFactory<*>,
 ) {
     abstract suspend fun respond(text: String)
     abstract suspend fun respondPrivate(text: String)

@@ -5,8 +5,7 @@ import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 
-abstract class PlatformAdapter<TConfig: Any>(
-    val config: TConfig,
+abstract class PlatformAdapter(
     val key: PlatformKey,
     val displayName: String
 ) {
