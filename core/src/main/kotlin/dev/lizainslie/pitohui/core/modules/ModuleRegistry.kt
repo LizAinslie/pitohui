@@ -3,16 +3,24 @@ package dev.lizainslie.pitohui.core.modules
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.fs.BotFS
 import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.File
 
 class ModuleRegistry(
     private val bot: Bot
 ) {
     val loadedModules = mutableListOf<LoadedModule>()
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun load(module: LoadedModule) {
         loadedModules += module
+
+        MDC.put("tag", "modules:${module.name}:load")
         module.instance.onLoad()
+        MDC.remove("tag")
+
+        log.info("Loaded module '${module.name}'...")
     }
 
     fun loadBundledModule(module: AbstractModule) {
@@ -73,7 +81,12 @@ class ModuleRegistry(
     }
 
     suspend fun initialize(module: LoadedModule) {
+        log.info("Initializing module '${module.name}'.")
+
+        MDC.put("tag", "modules:${module.name}:init")
         module.instance.onInit(bot)
+        MDC.remove("tag")
+
         bot.commands.registerModuleCommands(module.instance)
     }
 
@@ -88,7 +101,10 @@ class ModuleRegistry(
     }
 
     suspend fun unload(mod: LoadedModule) {
+        MDC.put("tag", "modules:${mod.name}:unload")
         mod.instance.onUnload()
+        MDC.remove("tag")
+
         bot.commands.unregisterModuleCommands(mod.instance)
         loadedModules.remove(mod)
     }
@@ -102,9 +118,10 @@ class ModuleRegistry(
      * Reload `mod` from disk
      */
     suspend fun reload(mod: LoadedModule) {
+        log.info("Reloading module '${mod.name}'.")
         val name = mod.name
         if (mod.source == ModuleSource.INTERNAL) {
-            println("Internal module '$name' cannot be reloaded.")
+            log.warn("Internal module '$name' cannot be reloaded.")
             return
         }
 
@@ -117,16 +134,19 @@ class ModuleRegistry(
         System.gc() // encourages class unloading
 
         initialize(name)
+        log.info("Reloaded module '${mod.name}'.")
     }
 
     suspend fun fullReload() {
+        log.info("Reloading all modules")
         for (mod in loadedModules.filter { it.source == ModuleSource.EXTERNAL }) {
             reload(mod)
         }
     }
 
-    fun loadJarModules() {
-        BotFS.modulesDir.listFiles().filter { it.isFile && it.extension == "jar" }.forEach {
+    fun loadJarModules(dir: File = BotFS.modulesDir) {
+        log.info("Loading JAR modules from ${dir.absolutePath}")
+        dir.listFiles().filter { it.isFile && it.extension == "jar" }.forEach {
             loadExternalModule(it)
         }
     }

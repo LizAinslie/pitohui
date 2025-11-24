@@ -30,7 +30,8 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import kotlin.collections.find
 
 object Discord : PlatformAdapter(
@@ -40,6 +41,8 @@ object Discord : PlatformAdapter(
     val config by Configs.config<DiscordPlatformConfig>()
 
     lateinit var kord: Kord
+
+    private val log = LoggerFactory.getLogger(this.javaClass)
 
     override val channelArgumentParser =
         PlatformArgumentParseFn { value ->
@@ -104,7 +107,9 @@ object Discord : PlatformAdapter(
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
-            println("registering command ${command.name} in guild ${guildConf.id}")
+            MDC.put("tag", "discord:commands:registration")
+            log.info("registering command ${command.name} in guild ${guildConf.id}")
+            MDC.remove("tag")
             val registeredCmd = kord.createGuildChatInputCommand(
                 guildConf.id,
                 command.name,
@@ -120,6 +125,8 @@ object Discord : PlatformAdapter(
     }
 
     override suspend fun unregisterCommand(command: RootCommand, module: AbstractModule) {
+        MDC.put("tag", "discord:commands:registration")
+
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
@@ -128,11 +135,13 @@ object Discord : PlatformAdapter(
 
             if (commandToRemove != null) {
                 kord.rest.interaction.deleteGuildApplicationCommand(kord.selfId, guildConf.id, commandToRemove.id)
-                println("Deleted command ${command.name} from guild ${guildConf.id}")
+                log.info("Deleted command ${command.name} from guild ${guildConf.id}")
             } else {
-                println("Command ${command.name} not found in guild ${guildConf.id}")
+                log.warn("Command ${command.name} not found in guild ${guildConf.id}")
             }
         }
+
+        MDC.remove("tag")
     }
 
     suspend fun getChannelById(id: Snowflake) = kord.getChannel(id)
@@ -154,6 +163,8 @@ object Discord : PlatformAdapter(
     suspend fun getUserById(id: String) = getUserById(Snowflake(id))
 
     private suspend fun GuildChatInputCommandInteractionCreateEvent.handle() {
+        MDC.put("tag", "discord:commands:handle")
+
         val interactionCmd = interaction.command
         val registration = bot.commands.getRegistration(interactionCmd.rootName)
 
@@ -182,7 +193,7 @@ object Discord : PlatformAdapter(
         if (interactionCmd is SubCommand) {
             val subCommandName = interactionCmd.name
 
-            println("Resolving subcommand: $subCommandName")
+            log.debug("Resolving subcommand: $subCommandName")
 
             val subCommand = command.subCommands.find { it.name == subCommandName }
 
@@ -190,11 +201,11 @@ object Discord : PlatformAdapter(
                 interaction.respondEphemeral {
                     content = "Subcommand $subCommandName not found"
                 }
-                println("Subcommand $subCommandName not found")
+                log.warn("Subcommand $subCommandName not found")
                 return
             }
 
-            println("Using subcommand: ${subCommand.name}")
+            log.debug("Using subcommand: ${subCommand.name}")
 
             handlingCommand = subCommand
         }
@@ -204,5 +215,7 @@ object Discord : PlatformAdapter(
             module = registration.module,
             interaction = interaction,
         ))
+
+        MDC.remove("tag")
     }
 }

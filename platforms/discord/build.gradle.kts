@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
+    implementation(libs.slf4jApi)
     implementation(libs.kord.core)
     implementation(libs.bundles.exposed)
     implementation(libs.kotlinx.serialization.json)

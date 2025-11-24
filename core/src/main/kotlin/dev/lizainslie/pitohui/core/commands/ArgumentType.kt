@@ -1,13 +1,15 @@
 package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import org.slf4j.LoggerFactory
 
 interface ArgumentType<out T> {
     fun parse(value: Any, context: CommandContext): T
 
     fun tryParse(value: Any, context: CommandContext) =
         try {
-            println("Parsing value: `$value` on platform ${context.platform.key} of value type ${value::class.simpleName} for ArgumentType.${this::class.simpleName}")
+            val log = LoggerFactory.getLogger(this.javaClass)
+            log.info("Parsing value: `$value` on platform ${context.platform.key} of value type ${value::class.simpleName} for ArgumentType.${this::class.simpleName}")
             Result.success(parse(value, context))
         } catch (e: Exception) {
             Result.failure(e)

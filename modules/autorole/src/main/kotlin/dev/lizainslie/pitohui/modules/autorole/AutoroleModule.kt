@@ -31,7 +31,7 @@ object AutoroleModule : AbstractModule(
         Discord.addEventListener<MemberJoinEvent> {
             val communityId = guildId.platform
 
-            println("new member joined $communityId. bot? ${member.isBot}")
+            log.info("new member joined $communityId. bot? ${member.isBot}")
 
             val autoroleSettings = newSuspendedTransaction {
                 AutoroleSettings.getAutoroleSettings(communityId)
@@ -39,12 +39,12 @@ object AutoroleModule : AbstractModule(
 
             if (member.isBot)
                 autoroleSettings.botRoleId?.let { botRoleId ->
-                    println("assigning role $botRoleId to user ${member.id.platform} in community $communityId")
+                    log.info("assigning role $botRoleId to user ${member.id.platform} in community $communityId")
                     member.addRole(Snowflake(botRoleId), "pitohui: autorole")
                 }
             else
                 autoroleSettings.memberRoleId?.let { memberRoleId ->
-                    println("assigning role $memberRoleId to user ${member.id.platform} in community $communityId")
+                    log.info("assigning role $memberRoleId to user ${member.id.platform} in community $communityId")
                     member.addRole(Snowflake(memberRoleId), "pitohui: autorole")
                 }
         }

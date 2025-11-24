@@ -60,7 +60,6 @@ class DiscordSlashCommandContext(
     }
 
     override suspend fun dump() {
-        println("dumping context")
         val stealth = callerIsStealth()
 
         val guild = getGuild()

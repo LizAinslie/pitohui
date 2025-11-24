@@ -7,13 +7,16 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.UnsupportedPlatformException
 
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.slf4j.LoggerFactory
 
 class Commands(
     private val bot: Bot
 ) {
     val commands = mutableListOf<CommandRegistration>()
+    private val log = LoggerFactory.getLogger(javaClass)
 
     suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
+        log.info("Registering command: '${command.name}'.")
         commands.add(CommandRegistration(command, module))
 
         bot.eachPlatform {
@@ -24,6 +27,7 @@ class Commands(
     }
 
     suspend fun unregisterModuleCommands(module: AbstractModule) {
+        log.info("Unregistering commands for module '${module.name}'.")
         val toRemove = commands.filter { it.module == module }
         commands.removeAll(toRemove)
 
@@ -37,6 +41,7 @@ class Commands(
     }
 
     suspend fun registerModuleCommands(module: AbstractModule) {
+        log.info("Registering commands for module '${module.name}'.")
         for (command in module.commands) {
             registerCommand(command, module)
         }
@@ -80,13 +85,18 @@ class Commands(
         }
 
         try {
+            log.info("Handling command: '${handlingCommand.rootName}' on platform '${context.platform.displayName}'.")
             handlingCommand.handle(context)
         } catch (exc: UnsupportedPlatformException) {
             respondUnsupportedPlatform(handlingCommand, context, exc)
         } catch (exc: Exception) {
+            log.error("Handling command '${handlingCommand.rootName}' failed with ${exc.message}: ", exc)
             if (devOpts != null) context.respondException(exc)
         }
 
-        if (devOpts != null && devOpts.contextDebug) context.dump()
+        if (devOpts != null && devOpts.contextDebug) {
+            log.debug("Dumping context.")
+            context.dump()
+        }
     }
 }

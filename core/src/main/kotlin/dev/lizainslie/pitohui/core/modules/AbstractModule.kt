@@ -11,6 +11,8 @@ import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 abstract class AbstractModule(
     val name: String,
@@ -22,6 +24,7 @@ abstract class AbstractModule(
     val dependencies: Set<String> = emptySet(),
 ) {
     protected lateinit var bot: Bot
+    protected val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     open fun onLoad() {}
     open fun onUnload() {}
