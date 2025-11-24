@@ -19,4 +19,5 @@ abstract class PlatformAdapter(
 
     abstract suspend fun start(bot: Bot)
     abstract suspend fun registerCommand(command: RootCommand, module: AbstractModule)
+    abstract suspend fun unregisterCommand(command: RootCommand, module: AbstractModule)
 }

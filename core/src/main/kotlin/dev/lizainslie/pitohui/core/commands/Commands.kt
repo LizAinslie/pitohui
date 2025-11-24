@@ -23,6 +23,26 @@ class Commands(
         }
     }
 
+    suspend fun unregisterModuleCommands(module: AbstractModule) {
+        val toRemove = commands.filter { it.module == module }
+        commands.removeAll(toRemove)
+
+        bot.eachPlatform {
+            for (reg in toRemove) {
+                if (module.supportsPlatform(it) && reg.command.supportsPlatform(it)) {
+                    it.unregisterCommand(reg.command, module)
+                }
+            }
+        }
+    }
+
+    suspend fun registerModuleCommands(module: AbstractModule) {
+        for (command in module.commands) {
+            registerCommand(command, module)
+        }
+    }
+
+
     fun getRegistration(commandName: String): CommandRegistration? =
         commands.find { it.command.rootName == commandName }
 

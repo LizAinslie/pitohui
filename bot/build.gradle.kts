@@ -13,9 +13,6 @@ dependencies {
     implementation(project(":platforms:discord"))
     implementation(project(":modules:system"))
     implementation(project(":modules:admin"))
-    implementation(project(":modules:vcnotify"))
-    implementation(project(":modules:autorole"))
-    implementation(project(":modules:message-embedder"))
 
     implementation(libs.bundles.kord)
     implementation(libs.bundles.exposed)

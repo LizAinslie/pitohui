@@ -24,6 +24,7 @@ abstract class AbstractModule(
     protected lateinit var bot: Bot
 
     open fun onLoad() {}
+    open fun onUnload() {}
     open fun onInit(bot: Bot) {
         this.bot = bot
     }

@@ -30,6 +30,7 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlin.collections.find
 
 object Discord : PlatformAdapter(
@@ -104,7 +105,7 @@ object Discord : PlatformAdapter(
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
             println("registering command ${command.name} in guild ${guildConf.id}")
-            kord.createGuildChatInputCommand(
+            val registeredCmd = kord.createGuildChatInputCommand(
                 guildConf.id,
                 command.name,
                 command.description,
@@ -112,6 +113,24 @@ object Discord : PlatformAdapter(
                 arguments(command.arguments)
 
                 subCommands(command.subCommands)
+            }
+
+            // todo: save registeredCmd.id for later use in unregistering
+        }
+    }
+
+    override suspend fun unregisterCommand(command: RootCommand, module: AbstractModule) {
+        for (guildConf in config.guilds) {
+            if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
+
+            val commands = kord.rest.interaction.getGuildApplicationCommands(kord.selfId, guildConf.id).toList()
+            val commandToRemove = commands.find { it.name == command.name }
+
+            if (commandToRemove != null) {
+                kord.rest.interaction.deleteGuildApplicationCommand(kord.selfId, guildConf.id, commandToRemove.id)
+                println("Deleted command ${command.name} from guild ${guildConf.id}")
+            } else {
+                println("Command ${command.name} not found in guild ${guildConf.id}")
             }
         }
     }

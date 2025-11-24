@@ -47,8 +47,8 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
 
     subCommand("list", "List all modules") {
         handle {
-            val modules = bot.modules.filter {
-                shouldListModule(it, this@handle)
+            val modules = bot.modules.loadedModules.filter {
+                shouldListModule(it.instance, this@handle)
             }
 
             if (this is DiscordCommandContext) {
@@ -59,7 +59,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
 
                     modules.forEach { module ->
                         field(module.name, inline = false) {
-                            buildModuleDescription(module, this@handle)
+                            buildModuleDescription(module.instance, this@handle)
                         }
                     }
                 }
@@ -74,7 +74,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
         handle {
             val moduleName = args[moduleNameArg]!!.lowercase()
 
-            val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
+            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName } ?: run {
                 respondError("Module **$moduleName** does not exist.")
                 return@handle
             }
@@ -84,7 +84,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
                 return@handle
             }
 
-            if (!module.optional) {
+            if (!module.instance.optional) {
                 respondError("Module **${module.name}** cannot be toggled.")
                 return@handle
             }
@@ -118,7 +118,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
         handle {
             val moduleName = args[moduleNameArg]!!.lowercase()
 
-            val module = bot.modules.firstOrNull { it.name == moduleName } ?: run {
+            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName } ?: run {
                 respondError("Module **$moduleName** does not exist.")
                 return@handle
             }
@@ -128,7 +128,7 @@ val ModuleCommand = defineCommand("module", "Manage modules") {
                 return@handle
             }
 
-            if (!module.optional) {
+            if (!module.instance.optional) {
                 respondError("Module **${module.name}** cannot be toggled.")
                 return@handle
             }

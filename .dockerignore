@@ -1,5 +1,5 @@
 .git
-root.example.d/config/database.json
+root.example.d/
 pitohui.iml
 .idea
 .kotlin
