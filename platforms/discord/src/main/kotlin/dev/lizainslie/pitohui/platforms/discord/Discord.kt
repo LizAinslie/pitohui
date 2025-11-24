@@ -17,14 +17,14 @@ import dev.lizainslie.pitohui.core.commands.BaseCommand
 import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.config.Configs
-import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
-import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
-import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
+import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
+import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
+import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
 import dev.lizainslie.pitohui.platforms.discord.config.DiscordPlatformConfig
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake

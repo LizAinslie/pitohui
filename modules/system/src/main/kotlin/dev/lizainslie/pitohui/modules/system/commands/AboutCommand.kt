@@ -34,11 +34,11 @@ val AboutCommand = defineCommand(
                     // original author and license fields intact or
                     // link to the original project in some way <3
                     field("Author", true) { "[Mey/Lizzy Ainslie](https://lizainslie.dev)" }
-                    field("Source Code", true) { "[Git](https://git.lizainslie.dev/mey/pitohui)" }
+                    field("Source Code", true) { "[Git](https://github.com/lizainslie/pitohui)" }
                     field(
                         "License",
                         true
-                    ) { "[MIT](https://git.lizainslie.dev/mey/pitohui/-/raw/main/LICENSE)" }
+                    ) { "[AGPLv3](https://github.com/LizAinslie/pitohui/blob/main/LICENSE)" }
 
                     footer {
                         text = "Pitohui v0.0.1-alpha.1, receiving on Discord."

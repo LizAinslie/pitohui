@@ -21,9 +21,6 @@ object VcNotifyModule : AbstractModule(
     tables = setOf(
         VcNotifySettingsTable,
     ),
-    dependencies = setOf(
-        SystemModule.name
-    )
 ) {
     val communitiesLastUsed = mutableMapOf<PlatformId, VcNotifyRecord>()
 }

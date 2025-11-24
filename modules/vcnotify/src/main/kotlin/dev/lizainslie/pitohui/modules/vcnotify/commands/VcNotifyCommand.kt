@@ -1,7 +1,6 @@
 package dev.lizainslie.pitohui.modules.vcnotify.commands
 
 import dev.kord.common.entity.Snowflake
-import dev.kord.rest.builder.message.allowedMentions
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcnotify.VcNotifyModule
@@ -9,10 +8,8 @@ import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifyRecord
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
-import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import dev.lizainslie.pitohui.util.time.formatDuration
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -94,10 +91,12 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                     val remainingTime = settings.cooldown - timeSinceLastUse
 
                     if (remainingTime > 0.seconds) {
+                        val lastUser = Discord.getUserById(lastUsedRecord.user)
+
                         respondError(
                             "You have already notified members in this voice channel recently.\nYou must wait ${
                                 formatDuration(remainingTime)
-                            } before notifying again.\n-# Last used by ${lastUsedRecord.user}."
+                            } before notifying again.\n${lastUser?.let { "-# Last used by ${it.mention}." }}"
                         )
 
                         return@enforceGuild

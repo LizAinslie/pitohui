@@ -4,10 +4,6 @@ import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
 
 object Configs {
-    private val json = Json {
-        encodeDefaults = true
-    }
-
     val loadedConfigs = mutableListOf<Config<*>>()
 
     fun <TConfig : ConfigBase> getConfigFileAnnotation(klass: KClass<out TConfig>): ConfigFile {

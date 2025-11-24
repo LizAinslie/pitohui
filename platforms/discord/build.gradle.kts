@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":core"))
+    api(project(":core"))
 
     implementation(libs.slf4jApi)
     implementation(libs.kord.core)

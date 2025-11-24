@@ -7,9 +7,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":platforms:discord"))
-    implementation(project(":modules:system"))
+    api(project(":core"))
+    api(project(":platforms:discord"))
+    api(project(":modules:system"))
 
     implementation(libs.kord.core)
     implementation(libs.bundles.exposed)
