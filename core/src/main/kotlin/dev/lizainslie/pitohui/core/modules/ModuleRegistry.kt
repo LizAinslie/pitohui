@@ -95,7 +95,14 @@ class ModuleRegistry(
 
     suspend fun reload(name: String) {
         val mod = get(name) ?: return
+        reload(mod)
+    }
 
+    /**
+     * Reload `mod` from disk
+     */
+    suspend fun reload(mod: LoadedModule) {
+        val name = mod.name
         if (mod.source == ModuleSource.INTERNAL) {
             println("Internal module '$name' cannot be reloaded.")
             return
@@ -110,6 +117,12 @@ class ModuleRegistry(
         System.gc() // encourages class unloading
 
         initialize(name)
+    }
+
+    suspend fun fullReload() {
+        for (mod in loadedModules.filter { it.source == ModuleSource.EXTERNAL }) {
+            reload(mod)
+        }
     }
 
     fun loadJarModules() {
