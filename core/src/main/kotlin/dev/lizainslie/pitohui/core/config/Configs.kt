@@ -1,13 +1,7 @@
 package dev.lizainslie.pitohui.core.config
 
-import dev.lizainslie.pitohui.core.fs.BotFS
-import dev.lizainslie.pitohui.core.platforms.PlatformKey
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
 import kotlin.reflect.KClass
-import kotlin.system.exitProcess
 
 object Configs {
     private val json = Json {

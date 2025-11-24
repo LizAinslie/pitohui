@@ -46,5 +46,6 @@ bin/
 
 root.example.d/bot.jar
 root.example.d/config/database.json
+root.example.d/config/logging.json
 root.example.d/config/platforms/discord.json
 root.example.d/modules/*.jar

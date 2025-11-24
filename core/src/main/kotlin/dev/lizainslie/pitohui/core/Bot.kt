@@ -6,6 +6,7 @@ import dev.lizainslie.pitohui.core.data.DbContext
 import dev.lizainslie.pitohui.core.data.DeveloperOptionsTable
 import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.fs.BotFS
+import dev.lizainslie.pitohui.core.logging.Logging
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleRegistry
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
@@ -20,8 +21,10 @@ class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
         // generate the base folder structure if it doesn't exist
         BotFS.generateBaseStructure()
 
-        // check to ensure that
+        // check to ensure that configs are valid
         Configs.checkConfigs()
+
+        Logging.init()
 
         DbContext.connect()
         DbContext.tables += ModuleSwitchTable

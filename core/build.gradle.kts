@@ -9,5 +9,6 @@ plugins {
 dependencies {
     implementation(libs.bundles.exposed)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.slf4jApi)
     testImplementation(kotlin("test"))
 }

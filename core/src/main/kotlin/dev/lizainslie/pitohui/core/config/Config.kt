@@ -48,6 +48,7 @@ class Config<TConfig : ConfigBase>(
             throw RuntimeException("Invalid config value in $file:\n $contents")
 
         currentValue = configValue
+        currentValue.onLoad()
     }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): TConfig = currentValue

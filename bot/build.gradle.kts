@@ -16,6 +16,7 @@ dependencies {
 
     implementation(libs.bundles.kord)
     implementation(libs.bundles.exposed)
+    implementation(libs.bundles.logging)
 
     implementation(libs.postgresql)
     implementation(libs.clikt)
