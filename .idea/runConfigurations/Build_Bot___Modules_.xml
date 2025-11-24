@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Build Bot &amp; Modules " type="CompoundRunConfigurationType">
-    <toRun name="pitohui:bot [assembleShadowDist]" type="GradleRunConfiguration" />
-    <toRun name="pitohui:modules:autorole [jar]" type="GradleRunConfiguration" />
-    <toRun name="pitohui:modules:vcnotify [jar]" type="GradleRunConfiguration" />
-    <method v="2" />
-  </configuration>
-</component>
