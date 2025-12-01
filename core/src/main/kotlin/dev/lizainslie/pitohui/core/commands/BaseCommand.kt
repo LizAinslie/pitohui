@@ -27,6 +27,7 @@ abstract class RootCommand(
     description: String,
 ) : BaseCommand(name, description) {
     override val rootName = name
+    open val communityOnly: Boolean = false
 
     open val subCommands: List<SubCommand> = emptyList()
 }

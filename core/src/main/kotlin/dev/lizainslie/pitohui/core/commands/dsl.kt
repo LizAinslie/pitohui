@@ -39,6 +39,7 @@ class RootCommandDsl(
     description: String,
 ) : BaseCommandDsl(name, description) {
     private val subCommands = mutableListOf<SubCommandDsl>()
+    var communityOnly: Boolean = false
 
     fun subCommand(
         name: String,
@@ -50,14 +51,17 @@ class RootCommandDsl(
     }
 
     fun buildRoot(): RootCommand {
+        // Capture properties to pass into the anonymous class
         val subCommands = subCommands
         val platforms = platforms
         val arguments = arguments
+        val communityOnly = communityOnly
 
         return object : RootCommand(name, description) {
             override val subCommands: List<SubCommand> = subCommands.map { it.buildSubCommand(this) }
             override val platforms: Set<PlatformKey> = platforms
             override val arguments: List<ArgumentDescriptor<*>> = arguments
+            override val communityOnly: Boolean = communityOnly
 
             override suspend fun handle(context: CommandContext) {
                 handler(context)

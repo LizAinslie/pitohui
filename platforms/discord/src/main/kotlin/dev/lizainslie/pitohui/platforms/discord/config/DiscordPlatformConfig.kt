@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DiscordPlatformConfig(
     val token: String = "",
+    val registerCommandsGlobally: Boolean = true,
     val guilds: List<DiscordGuildConfig> = emptyList(),
 ) : ConfigBase {
     override fun validate(): Boolean {

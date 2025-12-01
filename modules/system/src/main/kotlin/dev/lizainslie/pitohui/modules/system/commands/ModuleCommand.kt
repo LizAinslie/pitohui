@@ -42,8 +42,9 @@ suspend fun shouldListModule(module: AbstractModule, context: CommandContext) = 
     }
 }
 
-val ModuleCommand = defineCommand("module", "Manage modules") {
+val ModuleCommand = defineCommand("module", "Manage modules in your community") {
     platforms(Discord)
+    communityOnly = true
 
     subCommand("list", "List all modules") {
         handle {

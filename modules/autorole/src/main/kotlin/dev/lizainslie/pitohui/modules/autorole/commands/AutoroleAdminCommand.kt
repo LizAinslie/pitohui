@@ -13,9 +13,10 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 val AutoroleAdminCommand = defineCommand(
     "autorole_admin",
-    "Manage community autorole command",
+    "Manage community autorole settings",
 ) {
     platforms(Discord)
+    communityOnly = true
 
     subCommand(
         "set_member_role",

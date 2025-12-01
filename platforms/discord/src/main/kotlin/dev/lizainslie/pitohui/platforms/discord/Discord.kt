@@ -101,6 +101,18 @@ object Discord : PlatformAdapter(
     }
 
     override suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
+        if (!command.communityOnly && module.visibility != ModuleVisibility.DEVELOPER && config.registerCommandsGlobally) {
+            log.info("Registering global command ${command.name}")
+            kord.createGlobalChatInputCommand(
+                command.name,
+                command.description,
+            ) {
+                arguments(command.arguments)
+
+                subCommands(command.subCommands)
+            }
+        }
+
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
@@ -120,7 +132,23 @@ object Discord : PlatformAdapter(
     }
 
     override suspend fun unregisterCommand(command: RootCommand, module: AbstractModule) {
-        MDC.put("tag", "discord:commands:registration")
+        if (!command.communityOnly && config.registerCommandsGlobally) {
+            log.info("Getting all registered global commands to unregister ${command.name}")
+
+            val commands = kord.rest.interaction.getGlobalApplicationCommands(kord.selfId).toList()
+            log.debug("Found ${commands.size} registered global commands")
+            val commandToRemove = commands.find { it.name == command.name }
+
+            if (commandToRemove != null) {
+                kord.rest.interaction.deleteGlobalApplicationCommand(
+                    kord.selfId,
+                    commandToRemove.id
+                )
+                log.info("Deleted global command ${command.name}")
+            } else {
+                log.warn("Global command ${command.name} not found")
+            }
+        }
 
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue

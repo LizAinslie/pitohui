@@ -26,6 +26,7 @@ internal suspend fun CommandContext.respondNotInChannel() {
 @OptIn(DelicateCoroutinesApi::class) // DelicateCoroutinesApi is used here because we are using GlobalScope.launch, which is generally discouraged
 val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in a voice channel") {
     platforms(Discord)
+    communityOnly = true
 
     handle {
         enforceDiscord<DiscordCommandContext> {

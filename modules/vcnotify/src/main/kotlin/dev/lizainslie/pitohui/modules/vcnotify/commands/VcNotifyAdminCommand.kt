@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.minutes
 
 val VcNotifyAdminCommand = defineCommand("vcnotify_admin", "Admin commands for the VcNotify module") {
     platforms(Discord)
+    communityOnly = true
 
     subCommand("info", "Documentation for VcNotify") {
         handle {
