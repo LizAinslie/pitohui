@@ -45,7 +45,7 @@ object DbContext {
 
     fun migrate(tablesToMigrate: Set<Table> = tables) {
         val migrations = generateMigrations(tablesToMigrate)
-        transaction {
+        if (migrations.isNotEmpty()) transaction {
             log.info("Applying ${migrations.size} migration statements to database")
             migrations.forEach { statement ->
                 // Execute each statement
