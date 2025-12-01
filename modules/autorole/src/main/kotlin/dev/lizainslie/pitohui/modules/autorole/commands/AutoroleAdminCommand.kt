@@ -7,7 +7,6 @@ import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
-import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -29,8 +28,10 @@ val AutoroleAdminCommand = defineCommand(
                 enforceGuild { guild ->
                     val roleId = args[roleArg]!!
 
-                    if (!checkCallerPermission(Permission.ManageGuild))
-                        return@enforceGuild respondError("This command can only be executed by someone who has permission to manage the server")
+                    if (!checkCallerPermission(Permission.ManageGuild)) {
+                        respondError("This command can only be executed by someone who has permission to manage the server")
+                        return@enforceGuild
+                    }
 
                     newSuspendedTransaction {
                         var autoroleSettings = AutoroleSettings.getAutoroleSettings(communityId!!)
@@ -61,8 +62,10 @@ val AutoroleAdminCommand = defineCommand(
                 enforceGuild { guild ->
                     val roleId = args[roleArg]!!
 
-                    if (!checkCallerPermission(Permission.ManageGuild))
-                        return@enforceGuild respondError("This command can only be executed by someone who has permission to manage the server")
+                    if (!checkCallerPermission(Permission.ManageGuild)) {
+                        respondError("This command can only be executed by someone who has permission to manage the server")
+                        return@enforceGuild
+                    }
 
                     newSuspendedTransaction {
                         var autoroleSettings = AutoroleSettings.getAutoroleSettings(communityId!!)

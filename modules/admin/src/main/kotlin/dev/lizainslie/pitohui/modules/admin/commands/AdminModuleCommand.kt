@@ -24,8 +24,9 @@ val AdminModuleCommand = defineCommand(
             when (moduleName) {
                 null,
                 "all" -> {
+                    val response = respond("Reloading all external modules...")
                     ModuleRegistry.instance.fullReload()
-                    respond("All external modules reloaded.")
+                    response.createFollowup("All external modules reloaded.")
                 }
 
                 else -> {
@@ -34,9 +35,9 @@ val AdminModuleCommand = defineCommand(
                         return@handle
                     }
 
+                    val response = respond("Reloading module `$moduleName`...")
                     ModuleRegistry.instance.reload(moduleName)
-
-                    respond("Module `$moduleName` reloaded.")
+                    response.createFollowup("Module `$moduleName` reloaded.")
                 }
             }
         }

@@ -5,6 +5,7 @@ import dev.lizainslie.pitohui.core.data.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.core.platforms.entities.PlatformResponse
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 abstract class CommandContext(
@@ -12,21 +13,20 @@ abstract class CommandContext(
     val module: AbstractModule,
     val platform: PlatformAdapter,
 ) {
-    abstract suspend fun respond(text: String)
-    abstract suspend fun respondPrivate(text: String)
-    abstract suspend fun respondError(text: String)
-    open suspend fun respondException(e: Exception) {
+    abstract suspend fun respond(text: String): PlatformResponse
+    abstract suspend fun respondPrivate(text: String): PlatformResponse
+    abstract suspend fun respondError(text: String): PlatformResponse
+
+    open suspend fun respondException(e: Exception) =
         respondStealth("""An exception has occurred while running this command: ${e.message}
             |```kt
             |${e.stackTraceToString()}
             |```
         """.trimMargin())
-    }
 
-    suspend fun respondStealth(text: String) {
+    suspend fun respondStealth(text: String) =
         if (callerIsStealth()) respondPrivate(text)
         else respond(text)
-    }
 
     abstract fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T?
 

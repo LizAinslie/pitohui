@@ -10,6 +10,7 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.platforms.discord.entities.DiscordSlashCommandResponse
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import kotlinx.datetime.Clock
 
@@ -19,36 +20,46 @@ class DiscordSlashCommandContext(
 
     val interaction: ChatInputCommandInteraction
 ) : DiscordCommandContext(bot, module) {
-    override suspend fun respond(text: String) {
-        interaction.respondPublic {
+    override suspend fun respond(text: String): DiscordSlashCommandResponse {
+        val response = interaction.respondPublic {
             content = text
         }
+
+        return DiscordSlashCommandResponse(response)
     }
 
-    override suspend fun respondPrivate(text: String) {
-        interaction.respondEphemeral {
+    override suspend fun respondPrivate(text: String): DiscordSlashCommandResponse {
+        val response = interaction.respondEphemeral {
             content = text
         }
+
+        return DiscordSlashCommandResponse(response)
     }
 
-    override suspend fun respondError(text: String) {
-        interaction.respondEphemeral {
+    override suspend fun respondError(text: String): DiscordSlashCommandResponse {
+        val response = interaction.respondEphemeral {
             content = text
         }
+
+        return DiscordSlashCommandResponse(response)
     }
 
-    override suspend fun respond(text: String, block: EmbedBuilder.() -> Unit) {
-        interaction.respondPublic {
+    override suspend fun respond(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
+        val response = interaction.respondPublic {
             content = text
             embed(block)
         }
+
+        return DiscordSlashCommandResponse(response)
     }
 
-    override suspend fun respondPrivate(text: String, block: EmbedBuilder.() -> Unit) {
-        interaction.respondEphemeral {
+    override suspend fun respondPrivate(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
+        val response = interaction.respondEphemeral {
             content = text
             embed(block)
         }
+
+        return DiscordSlashCommandResponse(response)
     }
 
     override fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
