@@ -12,6 +12,7 @@ class PitohuiBot : SuspendingCliktCommand() {
         val bot = Bot(SystemModule, AdminModule)
 
         bot.enablePlatforms(Discord)
+        bot.loadModules()
 
         bot.init()
         bot.start()

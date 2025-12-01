@@ -4,6 +4,8 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.logging.logModule
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -40,39 +42,52 @@ class ModuleRegistry(
         )
     }
 
-    fun loadExternalModule(file: File) {
-        if (!file.exists()) return
-        if (!file.isFile) {
-            // todo: warn
-            return
-        }
+    suspend fun loadExternalModule(file: File) {
+        withContext(Dispatchers.IO) {
+            log.info("Loading external module from ${file.absolutePath}...")
 
-        if (file.extension != "jar") {
-            return
-        }
+            if (!file.exists()) return@withContext // this should never hit, just like me with pretty women
 
-        val url = file.toURI().toURL()
-        val cl = ModuleClassLoader(url, Bot::class.java.classLoader)
+            if (!file.isFile) {
+                log.warn("Module path ${file.absolutePath} is not a file, skipping.")
+                return@withContext
+            }
 
-        val stream = cl.getResourceAsStream("pitohui.module.json")
-            ?: error("pitohui.module.json missing in $url")
+            if (file.extension != "jar") {
+                log.warn("Module file ${file.absolutePath} is not a JAR file, skipping.")
+                return@withContext
+            }
 
-        val descriptor = Json.decodeFromString<ModuleManifest>(
-            stream.reader().readText()
-        )
+            val url = file.toURI().toURL()
+            val cl = ModuleClassLoader(url, Bot::class.java.classLoader)
 
-        val cls = cl.loadClass(descriptor.mainClass)
-        val instance = cls.getDeclaredField("INSTANCE").get(null) as AbstractModule
+            val stream = cl.getResourceAsStream("pitohui.module.json")
+                ?: run {
+                    log.warn("Module JAR ${file.absolutePath} is missing manifest file 'pitohui.module.json', skipping.")
+                    return@withContext
+                }
 
-        load(
-            LoadedModule(
-                name = instance.name,
-                instance = instance,
-                source = ModuleSource.EXTERNAL,
-                classLoader = cl,
-                jarFile = file,
+            val descriptor = Json.decodeFromString<ModuleManifest>(
+                stream.reader().readText()
             )
-        )
+
+            log.debug("Successfully read manifest. Module main class: ${descriptor.mainClass}")
+
+            val cls = cl.loadClass(descriptor.mainClass)
+            val instance = cls.getDeclaredField("INSTANCE").get(null) as AbstractModule
+
+            log.debug("Module class loaded, name: '${instance.name}'")
+
+            load(
+                LoadedModule(
+                    name = instance.name,
+                    instance = instance,
+                    source = ModuleSource.EXTERNAL,
+                    classLoader = cl,
+                    jarFile = file,
+                )
+            )
+        }
     }
 
     fun get(name: String): LoadedModule? = loadedModules.find { it.name == name }
@@ -158,10 +173,12 @@ class ModuleRegistry(
         }
     }
 
-    fun loadJarModules(dir: File = BotFS.modulesDir) {
+    suspend fun loadJarModules(dir: File = BotFS.modulesDir) {
         log.info("Loading JAR modules from ${dir.absolutePath}")
-        dir.listFiles().filter { it.isFile && it.extension == "jar" }.forEach {
-            loadExternalModule(it)
+        withContext(Dispatchers.IO) {
+            dir.listFiles().filter { it.isFile && it.extension == "jar" }.forEach {
+                loadExternalModule(it)
+            }
         }
     }
 }

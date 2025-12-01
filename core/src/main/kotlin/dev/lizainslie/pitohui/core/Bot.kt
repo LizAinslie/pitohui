@@ -30,7 +30,9 @@ class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
         DbContext.tables += ModuleSwitchTable
         DbContext.tables += DeveloperOptionsTable
         DbContext.migrate()
+    }
 
+    suspend fun loadModules() {
         baseModules.forEach {
             modules.loadBundledModule(it)
         }
