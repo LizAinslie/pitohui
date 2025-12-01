@@ -1,8 +1,6 @@
 package dev.lizainslie.pitohui.modules.system.commands
 
-import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 
@@ -34,11 +32,11 @@ val AboutCommand = defineCommand(
                     // original author and license fields intact or
                     // link to the original project in some way <3
                     field("Author", true) { "[Mey/Lizzy Ainslie](https://lizainslie.dev)" }
-                    field("Source Code", true) { "[Git](https://github.com/lizainslie/pitohui)" }
+                    field("Source Code", true) { "[Git](https://git.lizainslie.dev/mey/pitohui)" }
                     field(
                         "License",
                         true
-                    ) { "[AGPLv3](https://github.com/LizAinslie/pitohui/blob/main/LICENSE)" }
+                    ) { "[AGPLv3](https://git.lizainslie.dev/mey/pitohui/src/branch/main/LICENSE)" }
 
                     footer {
                         text = "Pitohui v0.0.1-alpha.1, receiving on Discord."
