@@ -2,9 +2,10 @@ package dev.lizainslie.pitohui.core.modules
 
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.fs.BotFS
+import dev.lizainslie.pitohui.core.logging.logModule
+import dev.lizainslie.pitohui.core.logging.suspendLogModule
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.io.File
 
 class ModuleRegistry(
@@ -14,13 +15,17 @@ class ModuleRegistry(
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun load(module: LoadedModule) {
-        loadedModules += module
+        logModule(module.instance) {
+            if (loadedModules.any { it.name == module.name }) {
+                log.warn("Module with name '${module.name}' is already loaded! Skipping.")
+                return@logModule
+            }
 
-        MDC.put("tag", "modules:${module.name}:load")
-        module.instance.onLoad()
-        MDC.remove("tag")
+            loadedModules += module
+            module.instance.onLoad()
 
-        log.info("Loaded module '${module.name}'...")
+            log.info("Loaded module '${module.name}'.")
+        }
     }
 
     fun loadBundledModule(module: AbstractModule) {
@@ -73,6 +78,7 @@ class ModuleRegistry(
     fun get(name: String): LoadedModule? = loadedModules.find { it.name == name }
 
     suspend fun initialize() {
+        log.info("Initializing ${loadedModules.size} modules.")
         loadedModules.sortByDependencies()
 
         for (module in loadedModules) {
@@ -81,13 +87,13 @@ class ModuleRegistry(
     }
 
     suspend fun initialize(module: LoadedModule) {
-        log.info("Initializing module '${module.name}'.")
+        suspendLogModule(module.instance) {
+            log.info("Initializing module '${module.name}'.")
 
-        MDC.put("tag", "modules:${module.name}:init")
-        module.instance.onInit(bot)
-        MDC.remove("tag")
+            module.instance.onInit(bot)
 
-        bot.commands.registerModuleCommands(module.instance)
+            bot.commands.registerModuleCommands(module.instance)
+        }
     }
 
     suspend fun initialize(name: String) {
@@ -101,12 +107,14 @@ class ModuleRegistry(
     }
 
     suspend fun unload(mod: LoadedModule) {
-        MDC.put("tag", "modules:${mod.name}:unload")
-        mod.instance.onUnload()
-        MDC.remove("tag")
+        suspendLogModule(mod.instance) {
+            log.info("Unloading module '${mod.name}'.")
 
-        bot.commands.unregisterModuleCommands(mod.instance)
-        loadedModules.remove(mod)
+            mod.instance.onUnload()
+
+            bot.commands.unregisterModuleCommands(mod.instance)
+            loadedModules.remove(mod)
+        }
     }
 
     suspend fun reload(name: String) {
@@ -118,23 +126,29 @@ class ModuleRegistry(
      * Reload `mod` from disk
      */
     suspend fun reload(mod: LoadedModule) {
-        log.info("Reloading module '${mod.name}'.")
-        val name = mod.name
-        if (mod.source == ModuleSource.INTERNAL) {
-            log.warn("Internal module '$name' cannot be reloaded.")
-            return
+        suspendLogModule(mod.instance) {
+            log.info("Reloading module '${mod.name}'.")
+            val name = mod.name
+            if (mod.source == ModuleSource.INTERNAL) {
+                log.warn("Internal module '$name' cannot be reloaded.")
+                return@suspendLogModule
+            }
+
+            unload(mod)
+
+            val jar = mod.jarFile ?: run {
+                log.error("Module '$name' is missing its JAR file, cannot reload.")
+                return@suspendLogModule
+            }
+
+            loadExternalModule(jar)
+
+            log.debug("Calling garbage collector to unload old module classes.")
+            System.gc() // encourages class unloading
+
+            initialize(name)
+            log.info("Reloaded module '${mod.name}'.")
         }
-
-        unload(mod)
-
-        val jar = mod.jarFile ?: error("Missing jar path")
-
-        loadExternalModule(jar)
-
-        System.gc() // encourages class unloading
-
-        initialize(name)
-        log.info("Reloaded module '${mod.name}'.")
     }
 
     suspend fun fullReload() {

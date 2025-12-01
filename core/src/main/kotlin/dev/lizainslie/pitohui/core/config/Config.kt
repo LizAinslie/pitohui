@@ -4,6 +4,7 @@ import dev.lizainslie.pitohui.core.fs.BotFS
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -23,6 +24,8 @@ class Config<TConfig : ConfigBase>(
         // todo: define some other defaults
     }
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     private val annotation = Configs.getConfigFileAnnotation(klass)
 
     private val file: File = when (annotation.type) {
@@ -39,6 +42,7 @@ class Config<TConfig : ConfigBase>(
     }
 
     fun load() {
+        log.info("${if (::currentValue.isInitialized) "Rel" else "L"}oading config with key '$key' from $file")
         val contents = file.readText(Charsets.UTF_8)
         val configValue = json.decodeFromString(serializer, contents)
 
@@ -48,6 +52,8 @@ class Config<TConfig : ConfigBase>(
             throw RuntimeException("Invalid config value in $file:\n $contents")
 
         currentValue = configValue
+
+        log.debug("Calling onLoad hook for config with key '$key'")
         currentValue.onLoad()
     }
 

@@ -1,10 +1,12 @@
 package dev.lizainslie.pitohui.core.config
 
-import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 
 object Configs {
     val loadedConfigs = mutableListOf<Config<*>>()
+
+    val log = LoggerFactory.getLogger(this::class.java)
 
     fun <TConfig : ConfigBase> getConfigFileAnnotation(klass: KClass<out TConfig>): ConfigFile {
         val annotations = klass.annotations.filterIsInstance<ConfigFile>()
@@ -13,7 +15,15 @@ object Configs {
             throw RuntimeException("${klass.simpleName} must have exactly one ConfigFile annotation!")
         }
 
-        return annotations.first()
+        val configFile = annotations.first()
+        log.debug(
+            "Found config file annotation: name='{}', key='{}', type='{}' for config class '{}'",
+            configFile.name,
+            configFile.key,
+            configFile.type,
+            klass.simpleName
+        )
+        return configFile
     }
 
     fun <TConfig : ConfigBase> getConfigKey(klass: KClass<out TConfig>) =
@@ -27,6 +37,7 @@ object Configs {
         if (loadedConfigs.any { it.key == key })
             return loadedConfigs.first { it.key == key } as Config<TConfig>
         else {
+            log.debug("Registering new config of type ${TConfig::class.simpleName} with key '$key'")
             val config = Config<TConfig>(key)
             loadedConfigs += config
             return config
@@ -39,6 +50,7 @@ object Configs {
         if (loadedConfigs.any { it.key == key })
             return loadedConfigs.first { it.key == key } as Config<TConfig>
         else {
+            log.debug("Registering new module config of type ${TConfig::class.simpleName} with key '$key' for module '$moduleName'")
             val config = Config<TConfig>(key, moduleName)
             loadedConfigs += config
             return config

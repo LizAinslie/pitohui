@@ -1,42 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- ============================
-         PROPERTIES & DEFAULT LEVEL
-         ============================ -->
-    <!-- Example: -Dlog.level=DEBUG -->
     <property name="LOG_LEVEL" value="${log.level:-INFO}" />
 
-    <!-- Size of async queue -->
-    <property name="ASYNC_QUEUE" value="2048" />
-
-    <!-- ================
-         PATTERN LAYOUTS
-         ================ -->
-    <property name="CONSOLE_PATTERN"
-              value="%highlight(%-5level) %cyan(%logger{36}) %yellow([%X{tag}]) - %msg%n"/>
-
-    <!-- ============
-         APPENDERS
-         ============ -->
-
-    <!-- Console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${CONSOLE_PATTERN}</pattern>
+            <pattern><![CDATA[%highlight(%-5level) %d{HH:mm:ss.SSS} %green(%logger{36}) %magenta(%replace(%X{module}){'^(.+)$','($1) '}){}%cyan(%replace(%X{platform}){'^(.+)$','<$1> '}){}%yellow(%replace(%X{tag}){'^(.+)$','[$1] '})- %msg%n]]></pattern>
         </encoder>
     </appender>
 
-    <!-- Async wrapper -->
     <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
-        <queueSize>${ASYNC_QUEUE}</queueSize>
+        <queueSize>2048</queueSize>
         <discardingThreshold>0</discardingThreshold>
         <appender-ref ref="CONSOLE"/>
     </appender>
 
-    <!-- ============
-         ROOT LOGGER
-         ============ -->
     <root level="${LOG_LEVEL}">
         <appender-ref ref="ASYNC_CONSOLE"/>
     </root>

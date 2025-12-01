@@ -17,6 +17,7 @@ import dev.lizainslie.pitohui.core.commands.BaseCommand
 import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.config.Configs
+import dev.lizainslie.pitohui.core.logging.suspendLogModule
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
@@ -30,8 +31,6 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import kotlin.collections.find
 
 object Discord : PlatformAdapter(
@@ -41,8 +40,6 @@ object Discord : PlatformAdapter(
     val config by Configs.config<DiscordPlatformConfig>()
 
     lateinit var kord: Kord
-
-    private val log = LoggerFactory.getLogger(this.javaClass)
 
     override val channelArgumentParser =
         PlatformArgumentParseFn { value ->
@@ -107,9 +104,7 @@ object Discord : PlatformAdapter(
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
-            MDC.put("tag", "discord:commands:registration")
             log.info("registering command ${command.name} in guild ${guildConf.id}")
-            MDC.remove("tag")
             val registeredCmd = kord.createGuildChatInputCommand(
                 guildConf.id,
                 command.name,
@@ -130,18 +125,24 @@ object Discord : PlatformAdapter(
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
-            val commands = kord.rest.interaction.getGuildApplicationCommands(kord.selfId, guildConf.id).toList()
+            log.debug("Getting all registered commands in guild ${guildConf.id} to unregister ${command.name}")
+
+            val commands =
+                kord.rest.interaction.getGuildApplicationCommands(kord.selfId, guildConf.id).toList()
+            log.debug("Found ${commands.size} registered commands in guild ${guildConf.id}")
             val commandToRemove = commands.find { it.name == command.name }
 
             if (commandToRemove != null) {
-                kord.rest.interaction.deleteGuildApplicationCommand(kord.selfId, guildConf.id, commandToRemove.id)
+                kord.rest.interaction.deleteGuildApplicationCommand(
+                    kord.selfId,
+                    guildConf.id,
+                    commandToRemove.id
+                )
                 log.info("Deleted command ${command.name} from guild ${guildConf.id}")
             } else {
                 log.warn("Command ${command.name} not found in guild ${guildConf.id}")
             }
         }
-
-        MDC.remove("tag")
     }
 
     suspend fun getChannelById(id: Snowflake) = kord.getChannel(id)
@@ -163,59 +164,63 @@ object Discord : PlatformAdapter(
     suspend fun getUserById(id: String) = getUserById(Snowflake(id))
 
     private suspend fun GuildChatInputCommandInteractionCreateEvent.handle() {
-        MDC.put("tag", "discord:commands:handle")
+        this@Discord.suspendLogPlatform {
 
-        val interactionCmd = interaction.command
-        val registration = bot.commands.getRegistration(interactionCmd.rootName)
+            val interactionCmd = interaction.command
+            val registration = bot.commands.getRegistration(interactionCmd.rootName)
 
-        if (registration == null) {
-            interaction.respondEphemeral {
-                content = "Command ${interactionCmd.rootName} not found"
+            if (registration == null) {
+                interaction.respondEphemeral {
+                    content = "Command ${interactionCmd.rootName} not found"
+                }
+                return@suspendLogPlatform
             }
-            return
-        }
 
-        if (!registration.module.isEnabledForCommunity(interaction.guildId.platform)) {
-            interaction.respondEphemeral {
-                content = "Command ${interactionCmd.rootName} is not enabled for this community"
-            }
-            return
-        }
+            suspendLogModule(registration.module) {
 
-        val command = registration.command
+                if (!registration.module.isEnabledForCommunity(interaction.guildId.platform)) {
+                    interaction.respondEphemeral {
+                        content = "Command ${interactionCmd.rootName} is not enabled for this community"
+                    }
+                    return@suspendLogModule
+                }
+
+                val command = registration.command
 
 //        val firstLevelOptions = interactionCmd.data.options.orEmpty()
 //        val subCommandPredicate =
 //            firstLevelOptions.all { it.value is Optional.Missing && it.subCommands is Optional.Missing }
 
-        var handlingCommand: BaseCommand = command
+                var handlingCommand: BaseCommand = command
 
-        if (interactionCmd is SubCommand) {
-            val subCommandName = interactionCmd.name
+                if (interactionCmd is SubCommand) {
+                    val subCommandName = interactionCmd.name
 
-            log.debug("Resolving subcommand: $subCommandName")
+                    log.debug("Resolving subcommand: $subCommandName")
 
-            val subCommand = command.subCommands.find { it.name == subCommandName }
+                    val subCommand = command.subCommands.find { it.name == subCommandName }
 
-            if (subCommand == null) {
-                interaction.respondEphemeral {
-                    content = "Subcommand $subCommandName not found"
+                    if (subCommand == null) {
+                        interaction.respondEphemeral {
+                            content = "Subcommand $subCommandName not found"
+                        }
+                        log.warn("Subcommand $subCommandName not found")
+                        return@suspendLogModule
+                    }
+
+                    log.debug("Using subcommand: ${subCommand.name}")
+
+                    handlingCommand = subCommand
                 }
-                log.warn("Subcommand $subCommandName not found")
-                return
+
+                bot.commands.dispatchCommand(
+                    handlingCommand, DiscordSlashCommandContext(
+                        bot = bot,
+                        module = registration.module,
+                        interaction = interaction,
+                    )
+                )
             }
-
-            log.debug("Using subcommand: ${subCommand.name}")
-
-            handlingCommand = subCommand
         }
-
-        bot.commands.dispatchCommand(handlingCommand, DiscordSlashCommandContext(
-            bot = bot,
-            module = registration.module,
-            interaction = interaction,
-        ))
-
-        MDC.remove("tag")
     }
 }

@@ -2,6 +2,9 @@ package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.data.DeveloperOptions
+import dev.lizainslie.pitohui.core.logging.suspendLogModule
+import dev.lizainslie.pitohui.core.logging.suspendLogPlatform
+import dev.lizainslie.pitohui.core.logging.suspendLogTag
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.UnsupportedPlatformException
@@ -16,34 +19,45 @@ class Commands(
     private val log = LoggerFactory.getLogger(javaClass)
 
     suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
-        log.info("Registering command: '${command.name}'.")
-        commands.add(CommandRegistration(command, module))
+        suspendLogModule(module) {
+            log.info("Registering command: '${command.name}'.")
+            commands.add(CommandRegistration(command, module))
 
-        bot.eachPlatform {
-            if (module.supportsPlatform(it)
-                && command.supportsPlatform(it))
-                it.registerCommand(command, module)
+            bot.eachPlatform {
+                suspendLogPlatform(it) {
+                    if (module.supportsPlatform(it)
+                        && command.supportsPlatform(it)
+                    )
+                        it.registerCommand(command, module)
+                }
+            }
         }
     }
 
     suspend fun unregisterModuleCommands(module: AbstractModule) {
-        log.info("Unregistering commands for module '${module.name}'.")
-        val toRemove = commands.filter { it.module == module }
-        commands.removeAll(toRemove)
+        suspendLogModule(module) {
+            log.info("Unregistering commands for module '${module.name}'.")
+            val toRemove = commands.filter { it.module == module }
+            commands.removeAll(toRemove)
 
-        bot.eachPlatform {
-            for (reg in toRemove) {
-                if (module.supportsPlatform(it) && reg.command.supportsPlatform(it)) {
-                    it.unregisterCommand(reg.command, module)
+            bot.eachPlatform {
+                suspendLogPlatform(it) {
+                    for (reg in toRemove) {
+                        if (module.supportsPlatform(it) && reg.command.supportsPlatform(it)) {
+                            it.unregisterCommand(reg.command, module)
+                        }
+                    }
                 }
             }
         }
     }
 
     suspend fun registerModuleCommands(module: AbstractModule) {
-        log.info("Registering commands for module '${module.name}'.")
-        for (command in module.commands) {
-            registerCommand(command, module)
+        suspendLogModule(module) {
+            log.info("Registering commands for module '${module.name}'.")
+            for (command in module.commands) {
+                registerCommand(command, module)
+            }
         }
     }
 
@@ -71,32 +85,38 @@ class Commands(
     }
 
     suspend fun dispatchCommand(handlingCommand: BaseCommand, context: CommandContext) {
-        if (!context.module.supportsPlatform(context.platform)) {
-            respondUnsupportedPlatform(handlingCommand, context)
-            return
-        }
+        suspendLogModule(context.module) {
+            suspendLogPlatform(context.platform) {
+                if (!context.module.supportsPlatform(context.platform)) {
+                    respondUnsupportedPlatform(handlingCommand, context)
+                    return@suspendLogPlatform
+                }
 
-        if (context.module.visibility == ModuleVisibility.DEVELOPER && !context.callerIsDeveloper()) {
-            return // exit silently.
-        }
+                if (context.module.visibility == ModuleVisibility.DEVELOPER && !context.callerIsDeveloper()) {
+                    return@suspendLogPlatform // exit silently.
+                }
 
-        val devOpts = newSuspendedTransaction {
-            DeveloperOptions.getDeveloperOptions(context.callerId)
-        }
+                val devOpts = newSuspendedTransaction {
+                    DeveloperOptions.getDeveloperOptions(context.callerId)
+                }
 
-        try {
-            log.info("Handling command: '${handlingCommand.rootName}' on platform '${context.platform.displayName}'.")
-            handlingCommand.handle(context)
-        } catch (exc: UnsupportedPlatformException) {
-            respondUnsupportedPlatform(handlingCommand, context, exc)
-        } catch (exc: Exception) {
-            log.error("Handling command '${handlingCommand.rootName}' failed with ${exc.message}: ", exc)
-            if (devOpts != null) context.respondException(exc)
-        }
+                try {
+                    log.info("Handling command: '${handlingCommand.rootName}' on platform '${context.platform.displayName}'.")
+                    suspendLogTag("command: ${handlingCommand.rootName}") {
+                        handlingCommand.handle(context)
+                    }
+                } catch (exc: UnsupportedPlatformException) {
+                    respondUnsupportedPlatform(handlingCommand, context, exc)
+                } catch (exc: Exception) {
+                    log.error("Handling command '${handlingCommand.rootName}' failed with ${exc.message}: ", exc)
+                    if (devOpts != null) context.respondException(exc)
+                }
 
-        if (devOpts != null && devOpts.contextDebug) {
-            log.debug("Dumping context.")
-            context.dump()
+                if (devOpts != null && devOpts.contextDebug) {
+                    log.debug("Dumping context.")
+                    context.dump()
+                }
+            }
         }
     }
 }
