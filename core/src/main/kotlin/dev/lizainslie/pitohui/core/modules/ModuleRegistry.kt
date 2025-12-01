@@ -16,6 +16,10 @@ class ModuleRegistry(
     val loadedModules = mutableListOf<LoadedModule>()
     private val log = LoggerFactory.getLogger(javaClass)
 
+    init {
+        instance = this
+    }
+
     fun load(module: LoadedModule) {
         logModule(module.instance) {
             if (loadedModules.any { it.name == module.name }) {
@@ -180,5 +184,9 @@ class ModuleRegistry(
                 loadExternalModule(it)
             }
         }
+    }
+
+    companion object {
+        lateinit var instance: ModuleRegistry
     }
 }

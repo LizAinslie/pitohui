@@ -4,6 +4,7 @@ import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
+import dev.lizainslie.pitohui.modules.admin.commands.AdminModuleCommand
 import dev.lizainslie.pitohui.modules.admin.commands.DumpContextCommand
 import dev.lizainslie.pitohui.modules.admin.commands.MigrateCommand
 import dev.lizainslie.pitohui.modules.admin.commands.ToggleStealthCommand
@@ -19,7 +20,8 @@ object AdminModule : AbstractModule(
     commands = setOf(
         MigrateCommand,
         ToggleStealthCommand,
-        DumpContextCommand
+        DumpContextCommand,
+        AdminModuleCommand,
     ),
     dependencies = setOf(SystemModule.name),
 ) {
