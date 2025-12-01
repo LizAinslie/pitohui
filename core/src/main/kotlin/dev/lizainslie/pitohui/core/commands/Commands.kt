@@ -63,13 +63,13 @@ class Commands(
 
 
     fun getRegistration(commandName: String): CommandRegistration? =
-        commands.find { it.command.rootName == commandName }
+        commands.find { it.command.rootCommand.name == commandName }
 
     private suspend fun respondUnsupportedPlatform(
         handlingCommand: BaseCommand,
         context: CommandContext
     ) {
-        context.respondError("The ${handlingCommand.rootName} command is not supported on ${context.platform.displayName}.")
+        context.respondError("The ${handlingCommand.rootCommand.name} command is not supported on ${context.platform.displayName}.")
     }
 
     private suspend fun respondUnsupportedPlatform(
@@ -77,7 +77,7 @@ class Commands(
         context: CommandContext,
         exception: UnsupportedPlatformException,
     ) {
-        context.respondError("The ${handlingCommand.rootName} command is not supported on ${exception.currentPlatform.displayName}. It can be used on: ${
+        context.respondError("The ${handlingCommand.rootCommand.name} command is not supported on ${exception.currentPlatform.displayName}. It can be used on: ${
             exception.allowedPlatforms.joinToString(
                 ", "
             ) { it.displayName }
@@ -96,19 +96,24 @@ class Commands(
                     return@suspendLogPlatform // exit silently.
                 }
 
+                if (handlingCommand.rootCommand.communityOnly && !context.isInCommunity) {
+                    context.respondError("The ${handlingCommand.rootCommand.name} command can only be used in communities.")
+                    return@suspendLogPlatform
+                }
+
                 val devOpts = newSuspendedTransaction {
                     DeveloperOptions.getDeveloperOptions(context.callerId)
                 }
 
                 try {
-                    log.info("Handling command: '${handlingCommand.rootName}' on platform '${context.platform.displayName}'.")
-                    suspendLogTag("command: ${handlingCommand.rootName}") {
+                    log.info("Handling command: '${handlingCommand.rootCommand.name}' on platform '${context.platform.displayName}'.")
+                    suspendLogTag("command: ${handlingCommand.rootCommand.name}") {
                         handlingCommand.handle(context)
                     }
                 } catch (exc: UnsupportedPlatformException) {
                     respondUnsupportedPlatform(handlingCommand, context, exc)
                 } catch (exc: Exception) {
-                    log.error("Handling command '${handlingCommand.rootName}' failed with ${exc.message}: ", exc)
+                    log.error("Handling command '${handlingCommand.rootCommand.name}' failed with ${exc.message}: ", exc)
                     if (devOpts != null) context.respondException(exc)
                 }
 

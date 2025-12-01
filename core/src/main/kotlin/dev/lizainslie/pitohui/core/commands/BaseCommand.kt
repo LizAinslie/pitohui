@@ -7,7 +7,7 @@ abstract class BaseCommand(
     val name: String,
     val description: String,
 ) {
-    abstract val rootName: String
+    abstract val rootCommand: RootCommand
 
     open val platforms: Set<PlatformKey> = emptySet()
     open val arguments: List<ArgumentDescriptor<*>> = emptyList()
@@ -26,7 +26,7 @@ abstract class RootCommand(
     name: String,
     description: String,
 ) : BaseCommand(name, description) {
-    override val rootName = name
+    override val rootCommand = this
     open val communityOnly: Boolean = false
 
     open val subCommands: List<SubCommand> = emptyList()
@@ -37,5 +37,5 @@ abstract class SubCommand(
     description: String,
     val parent: BaseCommand,
 ) : BaseCommand(name, description) {
-    override val rootName = parent.rootName
+    override val rootCommand = parent.rootCommand
 }
