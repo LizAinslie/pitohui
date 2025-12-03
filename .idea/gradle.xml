@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/modules/admin" />
             <option value="$PROJECT_DIR$/modules/autorole" />
             <option value="$PROJECT_DIR$/modules/message-embedder" />
+            <option value="$PROJECT_DIR$/modules/starboard" />
             <option value="$PROJECT_DIR$/modules/system" />
             <option value="$PROJECT_DIR$/modules/vcnotify" />
             <option value="$PROJECT_DIR$/platforms" />

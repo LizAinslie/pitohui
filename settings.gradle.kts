@@ -25,6 +25,7 @@ include(":core")
 include(":platforms:discord")
 
 include(":modules:system")
+include(":modules:starboard")
 include(":modules:admin")
 include(":modules:vcnotify")
 include(":modules:autorole")
