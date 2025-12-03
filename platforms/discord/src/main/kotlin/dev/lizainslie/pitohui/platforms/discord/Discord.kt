@@ -79,6 +79,21 @@ object Discord : PlatformAdapter(
             }
         }
 
+    fun parseEmojiIdentifier(value: String): String {
+        return if (value.startsWith("<:") && value.endsWith(">")) {
+            // custom emoji mention format: <:name:id>
+            val parts = value.substring(2, value.length - 1).split(":")
+            if (parts.size == 2) {
+                parts[1] // return the ID part
+            } else {
+                throw IllegalArgumentException("Invalid custom emoji format: $value")
+            }
+        } else if (value.all { it.isDigit() }) {
+            // raw ID format
+            value
+        } else value // assume it's a unicode emoji and return as is
+    }
+
     override suspend fun initialize(bot: Bot) {
         super.initialize(bot)
         kord = Kord(config.token)
@@ -172,6 +187,8 @@ object Discord : PlatformAdapter(
             }
         }
     }
+
+    val myId get() = kord.selfId
 
     suspend fun getChannelById(id: Snowflake) = kord.getChannel(id)
     suspend fun getChannelById(id: PlatformId) = getChannelById(id.snowflake)

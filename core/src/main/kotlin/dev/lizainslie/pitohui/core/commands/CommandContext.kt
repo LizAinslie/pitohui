@@ -13,16 +13,25 @@ abstract class CommandContext(
     val module: AbstractModule,
     val platform: PlatformAdapter,
 ) {
+    open var response: PlatformResponse? = null
     abstract suspend fun respond(text: String): PlatformResponse
     abstract suspend fun respondPrivate(text: String): PlatformResponse
     abstract suspend fun respondError(text: String): PlatformResponse
 
     open suspend fun respondException(e: Exception) =
-        respondStealth("""An exception has occurred while running this command: ${e.message}
-            |```kt
-            |${e.stackTraceToString()}
-            |```
-        """.trimMargin())
+        response?.createStealthFollowup(
+            """An exception has occurred while running this command: ${e.message}
+                    |```kt
+                    |${e.stackTraceToString()}
+                    |```
+                """.trimMargin()
+        ) ?: respondStealth(
+            """An exception has occurred while running this command: ${e.message}
+                    |```kt
+                    |${e.stackTraceToString()}
+                    |```
+                """.trimMargin()
+        )
 
     suspend fun respondStealth(text: String) =
         if (callerIsStealth()) respondPrivate(text)

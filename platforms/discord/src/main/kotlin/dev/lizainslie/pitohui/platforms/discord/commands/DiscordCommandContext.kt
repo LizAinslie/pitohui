@@ -69,9 +69,14 @@ abstract class DiscordCommandContext(
         else respond(text, block)
 
     override suspend fun respondException(e: Exception) =
-        respondStealth {
-            buildExceptionEmbed(e)
-        }
+        if (response != null)
+            (response as DiscordResponse).createStealthFollowup {
+                buildExceptionEmbed(e)
+            }
+        else
+            respondStealth {
+                buildExceptionEmbed(e)
+            }
 
     open suspend fun enforceGuild(
         message: String = "This command must be run in a server",

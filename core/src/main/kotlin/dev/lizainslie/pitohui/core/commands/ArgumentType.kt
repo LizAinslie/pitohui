@@ -35,6 +35,15 @@ object ArgumentTypes {
             value.toString().toInt()
     }
 
+    object BOOLEAN : ArgumentType<Boolean> {
+        override fun parse(value: Any, context: CommandContext) =
+            when (value.toString().lowercase()) {
+                "true", "yes", "1" -> true
+                "false", "no", "0" -> false
+                else -> throw IllegalArgumentException("Invalid boolean value: $value")
+            }
+    }
+
     object CHANNEL : ArgumentType<PlatformId> {
         override fun parse(value: Any, context: CommandContext): PlatformId =
             context.platform.channelArgumentParser?.parse(value) ?:

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-java -Xmx512m -jar ./bot.jar
+java -Xmx512m -Dlog.level=DEBUG -jar ./bot.jar

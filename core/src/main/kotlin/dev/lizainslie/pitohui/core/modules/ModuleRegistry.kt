@@ -1,6 +1,7 @@
 package dev.lizainslie.pitohui.core.modules
 
 import dev.lizainslie.pitohui.core.Bot
+import dev.lizainslie.pitohui.core.data.DbContext
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.logging.logModule
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
@@ -26,6 +27,9 @@ class ModuleRegistry(
                 log.warn("Module with name '${module.name}' is already loaded! Skipping.")
                 return@logModule
             }
+
+            log.info("Running migrations for module '${module.name}'...")
+            DbContext.migrate(module.instance.tables)
 
             loadedModules += module
             module.instance.onLoad()

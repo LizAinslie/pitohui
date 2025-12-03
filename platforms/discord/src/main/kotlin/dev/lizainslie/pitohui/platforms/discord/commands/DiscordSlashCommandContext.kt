@@ -21,45 +21,50 @@ class DiscordSlashCommandContext(
     val interaction: ChatInputCommandInteraction
 ) : DiscordCommandContext(bot, module) {
     override suspend fun respond(text: String): DiscordSlashCommandResponse {
-        val response = interaction.respondPublic {
+        val kordResponse = interaction.respondPublic {
             content = text
         }
 
-        return DiscordSlashCommandResponse(response)
+        response = DiscordSlashCommandResponse(kordResponse, this)
+        return response as DiscordSlashCommandResponse
     }
 
     override suspend fun respondPrivate(text: String): DiscordSlashCommandResponse {
-        val response = interaction.respondEphemeral {
+        val kordResponse = interaction.respondEphemeral {
             content = text
         }
 
-        return DiscordSlashCommandResponse(response)
+        response = DiscordSlashCommandResponse(kordResponse, this)
+        return response as DiscordSlashCommandResponse
     }
 
     override suspend fun respondError(text: String): DiscordSlashCommandResponse {
-        val response = interaction.respondEphemeral {
+        val kordResponse = interaction.respondEphemeral {
             content = text
         }
 
-        return DiscordSlashCommandResponse(response)
+        response = DiscordSlashCommandResponse(kordResponse, this)
+        return response as DiscordSlashCommandResponse
     }
 
     override suspend fun respond(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
-        val response = interaction.respondPublic {
+        val kordResponse = interaction.respondPublic {
             content = text
             embed(block)
         }
 
-        return DiscordSlashCommandResponse(response)
+        response = DiscordSlashCommandResponse(kordResponse, this)
+        return response as DiscordSlashCommandResponse
     }
 
     override suspend fun respondPrivate(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
-        val response = interaction.respondEphemeral {
+        val kordResponse = interaction.respondEphemeral {
             content = text
             embed(block)
         }
 
-        return DiscordSlashCommandResponse(response)
+        response = DiscordSlashCommandResponse(kordResponse, this)
+        return response as DiscordSlashCommandResponse
     }
 
     override fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {

@@ -2,6 +2,7 @@ package dev.lizainslie.pitohui.platforms.discord.extensions
 
 import dev.kord.rest.builder.interaction.BaseInputChatBuilder
 import dev.kord.rest.builder.interaction.RootInputChatBuilder
+import dev.kord.rest.builder.interaction.boolean
 import dev.kord.rest.builder.interaction.channel
 import dev.kord.rest.builder.interaction.integer
 import dev.kord.rest.builder.interaction.role
@@ -27,12 +28,11 @@ fun BaseInputChatBuilder.arguments(arguments: List<ArgumentDescriptor<*>>) {
                 }
             }
 
-//                        is ArgumentType.Boolean -> {
-//                            boolean(argument.name, argument.description) {
-//                                required = argument.required
-//                                defaultValue = argument.defaultValue
-//                            }
-//                        }
+            is ArgumentTypes.BOOLEAN -> {
+                boolean(argument.name, argument.description) {
+                    required = argument.required
+                }
+            }
 
             is ArgumentTypes.CHANNEL -> {
                 channel(argument.name, argument.description) {
