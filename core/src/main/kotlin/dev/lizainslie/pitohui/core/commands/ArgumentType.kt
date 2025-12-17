@@ -2,6 +2,7 @@ package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration
 
 interface ArgumentType<out T> {
     fun parse(value: Any, context: CommandContext): T
@@ -44,6 +45,11 @@ object ArgumentTypes {
             }
     }
 
+    object DURATION : ArgumentType<Duration> {
+        override fun parse(value: Any, context: CommandContext) =
+            Duration.parse(value.toString())
+    }
+
     object CHANNEL : ArgumentType<PlatformId> {
         override fun parse(value: Any, context: CommandContext): PlatformId =
             context.platform.channelArgumentParser?.parse(value) ?:
@@ -55,5 +61,11 @@ object ArgumentTypes {
         override fun parse(value: Any, context: CommandContext): PlatformId =
             context.platform.roleArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support ROLE arguments.")
+    }
+
+    object USER : ArgumentType<PlatformId> {
+        override fun parse(value: Any, context: CommandContext): PlatformId =
+            context.platform.userArgumentParser?.parse(value) ?:
+            throw IllegalArgumentException("Platform ${context.platform.displayName} does not support USER arguments.")
     }
 }

@@ -8,6 +8,7 @@ import dev.kord.rest.builder.interaction.integer
 import dev.kord.rest.builder.interaction.role
 import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.interaction.subCommand
+import dev.kord.rest.builder.interaction.user
 import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.SubCommand
@@ -16,7 +17,7 @@ import kotlin.collections.forEach
 fun BaseInputChatBuilder.arguments(arguments: List<ArgumentDescriptor<*>>) {
     arguments.forEach { argument ->
         when (argument.argumentType) {
-            is ArgumentTypes.STRING -> {
+            is ArgumentTypes.STRING, ArgumentTypes.DURATION -> {
                 string(argument.name, argument.description) {
                     required = argument.required
                 }
@@ -42,6 +43,12 @@ fun BaseInputChatBuilder.arguments(arguments: List<ArgumentDescriptor<*>>) {
 
             is ArgumentTypes.ROLE -> {
                 role(argument.name, argument.description) {
+                    required = argument.required
+                }
+            }
+
+            is ArgumentTypes.USER -> {
+                user(argument.name, argument.description) {
                     required = argument.required
                 }
             }

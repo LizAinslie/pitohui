@@ -256,7 +256,7 @@ object StarboardModule : AbstractModule(
     }
 
     suspend fun postNewStarboardEmbed(starboard: Starboard, message: Message, starCount: Int) =
-        Discord.getGuildById(starboard.communityId.value).let { guild ->
+        Discord.getGuildById(starboard.communityId.value)?.let { guild ->
             val emojiRep = emojiRepresentation(starboard.emoji, guild) ?: starboard.emoji
             Discord.getChannelById(starboard.channelId.value)?.let { channel ->
                 if (channel is MessageChannel) {
@@ -321,7 +321,7 @@ object StarboardModule : AbstractModule(
         }
 
     suspend fun editStarboardEmbed(starboard: Starboard, entry: StarboardEntry) {
-        Discord.getGuildById(starboard.communityId.value).let { guild ->
+        Discord.getGuildById(starboard.communityId.value)?.let { guild ->
             val emojiRep = emojiRepresentation(starboard.emoji, guild) ?: starboard.emoji
             Discord.getChannelById(starboard.channelId.value)?.let { channel ->
                 if (channel is MessageChannel) {

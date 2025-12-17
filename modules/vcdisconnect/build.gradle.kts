@@ -7,9 +7,12 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.bundles.exposed)
+    api(project(":core"))
+    api(project(":platforms:discord"))
+
+    implementation(libs.kord.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.slf4jApi)
+
     testImplementation(kotlin("test"))
 }

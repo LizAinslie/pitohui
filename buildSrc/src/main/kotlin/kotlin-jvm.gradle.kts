@@ -26,4 +26,11 @@ tasks.withType<Test>().configureEach {
             TestLogEvent.SKIPPED
         )
     }
+
+    System.getProperties().forEach { (key, value) ->
+        val keyStr = key.toString()
+        if (keyStr.startsWith("pitohui.")) {
+            systemProperty(keyStr, value)
+        }
+    }
 }

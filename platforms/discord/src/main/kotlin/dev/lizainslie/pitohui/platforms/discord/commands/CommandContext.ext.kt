@@ -9,10 +9,16 @@ suspend inline fun <T: Any, reified TContext : DiscordCommandContext> CommandCon
     else null
 }
 
-suspend inline fun <reified TContext : DiscordCommandContext> CommandContext.enforceDiscord(
+suspend inline fun <reified TContext : DiscordCommandContext> CommandContext.enforceDiscordType(
     block: suspend TContext.() -> Unit
 ) {
     if (this is TContext) this.block()
     else
         throw UnsupportedPlatformException(platform, Discord)
 }
+
+suspend fun CommandContext.enforceDiscord(block: suspend DiscordCommandContext.() -> Unit) =
+    enforceDiscordType<DiscordCommandContext>(block)
+
+suspend fun CommandContext.enforceDiscordSlash(block: suspend DiscordSlashCommandContext.() -> Unit) =
+    enforceDiscordType<DiscordSlashCommandContext>(block)

@@ -28,6 +28,7 @@ include(":modules:system")
 include(":modules:starboard")
 include(":modules:admin")
 include(":modules:vcnotify")
+include(":modules:vcdisconnect")
 include(":modules:autorole")
 include(":modules:message-embedder")
 

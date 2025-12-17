@@ -8,9 +8,9 @@ import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifyRecord
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
+import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
-import dev.lizainslie.pitohui.util.time.formatDuration
+import dev.lizainslie.pitohui.util.time.format
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -29,7 +29,7 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
     communityOnly = true
 
     handle {
-        enforceDiscord<DiscordCommandContext> {
+        enforceDiscordType<DiscordCommandContext> {
             enforceGuild { guild ->
                 val communityId = guild.id.platform
                 val member = getMember()!!
@@ -94,11 +94,12 @@ val VcNotifyCommand = defineCommand("vcnotify", "Notify other members you are in
                     if (remainingTime > 0.seconds) {
                         val lastUser = Discord.getUserById(lastUsedRecord.user)
 
-                        respondError(
-                            "You have already notified members in this voice channel recently.\nYou must wait ${
-                                formatDuration(remainingTime)
+                        respondPrivate {
+                            title = "Cooldown Active"
+                            description = "You have already notified members in this voice channel recently.\nYou must wait ${
+                                remainingTime.format()
                             } before notifying again.\n${lastUser?.let { "-# Last used by ${it.mention}." }}"
-                        )
+                        }
 
                         return@enforceGuild
                     } else notify()

@@ -15,7 +15,7 @@ class ArgumentDescriptor<T>(
         log.debug("Resolving argument `$name` with type `${argumentType::class.simpleName}`")
         val value = commandContext.resolveRawArgumentValue(this)
 
-        log.debug("Resolved value: `$value`")
+        log.debug("Resolved value: `{}`", value)
 
         if (value == null && required) {
             commandContext.respondError("Option `$name` is required and no default value is provided")

@@ -6,7 +6,7 @@ import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
+import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -24,7 +24,7 @@ val AutoroleAdminCommand = defineCommand(
         val roleArg = argument("role", "The role to apply to new users", ArgumentTypes.ROLE, required = true)
 
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     val roleId = args[roleArg]!!
 
@@ -58,7 +58,7 @@ val AutoroleAdminCommand = defineCommand(
         val roleArg = argument("role", "The role to apply to new bot", ArgumentTypes.ROLE, required = true)
 
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     val roleId = args[roleArg]!!
 

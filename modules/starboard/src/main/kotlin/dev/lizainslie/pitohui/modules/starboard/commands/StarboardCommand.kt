@@ -1,7 +1,5 @@
 package dev.lizainslie.pitohui.modules.starboard.commands
 
-import dev.kord.common.entity.Snowflake
-import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.MessageChannel
 import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
@@ -10,7 +8,7 @@ import dev.lizainslie.pitohui.modules.starboard.data.Starboard
 import dev.lizainslie.pitohui.modules.starboard.data.StarboardTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
+import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -35,7 +33,7 @@ val StarboardCommand = defineCommand(
             val emoji = Discord.parseEmojiIdentifier(args[emojiArg]!!)
             val selfStar = args[selfStarArg] ?: false
 
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     val response = respondPrivate("Creating starboard...")
                     val communityId = guild.id.platform
@@ -96,7 +94,7 @@ val StarboardCommand = defineCommand(
         handle {
             val channel = args[channelArg] ?: return@handle
 
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     val communityId = guild.id.platform
 
@@ -121,7 +119,7 @@ val StarboardCommand = defineCommand(
 
     subCommand("list", "List the starboards in this community.") {
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     val communityId = guild.id.platform
 

@@ -7,7 +7,8 @@ object BotFS {
     /**
      * The root bot directory
      */
-    val baseDir = File(Bot::class.java.protectionDomain.codeSource.location.path).parentFile
+    val baseDir: File = System.getProperty("pitohui.bot.dir")?.let { File(it) }
+        ?: File(Bot::class.java.protectionDomain.codeSource.location.path).parentFile
 
     /**
      * The directory where hosts are expected to place platform and module

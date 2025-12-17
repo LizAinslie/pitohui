@@ -6,9 +6,10 @@ import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
-import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
+import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
+import dev.lizainslie.pitohui.util.time.format
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration.Companion.minutes
 
@@ -18,7 +19,7 @@ val VcNotifyAdminCommand = defineCommand("vcnotify_admin", "Admin commands for t
 
     subCommand("info", "Documentation for VcNotify") {
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 respondPrivate {
                     title = "VcNotify Documentation"
                     description = """
@@ -39,7 +40,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         val roleArgument = argument("role", "The role to set for notifications", ArgumentTypes.ROLE, required = true)
 
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
@@ -78,7 +79,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         val formatArgument = argument("format", "The message format to set", ArgumentTypes.STRING, required = true)
 
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
@@ -105,10 +106,10 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
 
     subCommand("setcooldown", "Set the cooldown duration for notifications") {
         val cooldownArgument =
-            argument("duration", "The cooldown duration in minutes", ArgumentTypes.INT, required = true)
+            argument("duration", "The cooldown duration", ArgumentTypes.DURATION, required = true)
 
         handle {
-            enforceDiscord<DiscordCommandContext> {
+            enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
@@ -123,10 +124,10 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
                         if (settings == null)
                             settings = VcNotifySettings.create(communityId)
 
-                        val cooldownMinutes = args[cooldownArgument] ?: 30
-                        settings.cooldown = cooldownMinutes.minutes
+                        val cooldown = args[cooldownArgument] ?: 30.minutes
+                        settings.cooldown = cooldown
 
-                        respondPrivate("Notification cooldown set to ${settings.cooldown.inWholeMinutes} minutes.")
+                        respondPrivate("Notification cooldown set to ${settings.cooldown.format()}.")
                     }
                 }
             }

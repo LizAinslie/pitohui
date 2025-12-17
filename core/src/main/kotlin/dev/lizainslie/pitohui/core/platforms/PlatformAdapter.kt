@@ -16,6 +16,7 @@ abstract class PlatformAdapter(
 
     open val channelArgumentParser: PlatformArgumentParseFn<PlatformId>? = null
     open val roleArgumentParser: PlatformArgumentParseFn<PlatformId>? = null
+    open val userArgumentParser: PlatformArgumentParseFn<PlatformId>? = null
 
     lateinit var bot: Bot
 

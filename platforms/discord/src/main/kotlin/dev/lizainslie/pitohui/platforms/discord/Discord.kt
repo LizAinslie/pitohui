@@ -3,11 +3,14 @@ package dev.lizainslie.pitohui.platforms.discord
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.behavior.interaction.respondEphemeral
+import dev.kord.core.entity.Member
 import dev.kord.core.entity.Role
+import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.interaction.SubCommand
 import dev.kord.core.event.Event
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
+import dev.kord.core.exception.EntityNotFoundException
 import dev.kord.core.on
 import dev.kord.gateway.ALL
 import dev.kord.gateway.Intents
@@ -68,12 +71,31 @@ object Discord : PlatformAdapter(
                 is String -> {
                     val roleId =
                         if (value.startsWith("<@&") && value.endsWith(">")) // this is a formatted mention
-                            value.substring(2, value.length - 1)
+                            value.substring(3, value.length - 1)
                         else if (value.all { it.isDigit() }) // this is a raw ID
                             value
                         else throw IllegalArgumentException("Invalid role ID format: $value") // ohno.jpg
 
                     PlatformId(key, roleId)
+                }
+                else -> throw IllegalArgumentException("Invalid role type: ${value::class.simpleName}")
+            }
+        }
+
+    override val userArgumentParser =
+        PlatformArgumentParseFn { value ->
+            when (value) {
+                is User -> value.id.platform
+                is Snowflake -> value.platform
+                is String -> {
+                    val userId =
+                        if (value.startsWith("<@") && value.endsWith(">")) // this is a formatted mention
+                            value.substring(2, value.length - 1)
+                        else if (value.all { it.isDigit() }) // this is a raw ID
+                            value
+                        else throw IllegalArgumentException("Invalid role ID format: $value") // ohno.jpg
+
+                    PlatformId(key, userId)
                 }
                 else -> throw IllegalArgumentException("Invalid role type: ${value::class.simpleName}")
             }
@@ -168,11 +190,11 @@ object Discord : PlatformAdapter(
         for (guildConf in config.guilds) {
             if (module.visibility == ModuleVisibility.DEVELOPER && !guildConf.admin) continue
 
-            log.debug("Getting all registered commands in guild ${guildConf.id} to unregister ${command.name}")
+            log.debug("Getting all registered commands in guild {} to unregister {}", guildConf.id, command.name)
 
             val commands =
                 kord.rest.interaction.getGuildApplicationCommands(kord.selfId, guildConf.id).toList()
-            log.debug("Found ${commands.size} registered commands in guild ${guildConf.id}")
+            log.debug("Found {} registered commands in guild {}", commands.size, guildConf.id)
             val commandToRemove = commands.find { it.name == command.name }
 
             if (commandToRemove != null) {
@@ -196,7 +218,9 @@ object Discord : PlatformAdapter(
     suspend fun getChannelById(id: ULong) = getChannelById(Snowflake(id))
     suspend fun getChannelById(id: String) = getChannelById(Snowflake(id))
 
-    suspend fun getGuildById(id: Snowflake) = kord.getGuild(id)
+    suspend fun getGuildById(id: Snowflake) = try {
+        kord.getGuild(id)
+    } catch (e: EntityNotFoundException) { null }
     suspend fun getGuildById(id: PlatformId) = getGuildById(id.snowflake)
     suspend fun getGuildById(id: Long) = getGuildById(Snowflake(id))
     suspend fun getGuildById(id: ULong) = getGuildById(Snowflake(id))
