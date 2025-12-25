@@ -137,6 +137,10 @@ object Discord : PlatformAdapter(
         }
     }
 
+    override suspend fun stop() {
+        kord.shutdown()
+    }
+
     override suspend fun registerCommand(command: RootCommand, module: AbstractModule) {
         if (!command.communityOnly && module.visibility != ModuleVisibility.DEVELOPER && config.registerCommandsGlobally) {
             log.info("Registering global command ${command.name}")

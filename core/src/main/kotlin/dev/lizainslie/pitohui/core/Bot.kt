@@ -65,4 +65,13 @@ class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
             it.start(this)
         }
     }
+
+    suspend fun stop() {
+        eachPlatform {
+            it.stop()
+        }
+
+        modules.unloadAll()
+        BotFS.Temp.cleanup()
+    }
 }

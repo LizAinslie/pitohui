@@ -1,5 +1,6 @@
 package dev.lizainslie.pitohui.modules.vcdisconnect.commands
 
+import dev.lizainslie.pitohui.core.commands.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcdisconnect.VcDisconnectModule
 import dev.lizainslie.pitohui.modules.vcdisconnect.data.DisconnectTimer
@@ -21,7 +22,7 @@ val VcDisconnectCommand = defineCommand(
         val durationArgument = argument(
             "duration",
             "The duration (in minutes) after which to disconnect from the voice channel.",
-            dev.lizainslie.pitohui.core.commands.ArgumentTypes.DURATION,
+            ArgumentTypes.DURATION,
             required = true
         )
 

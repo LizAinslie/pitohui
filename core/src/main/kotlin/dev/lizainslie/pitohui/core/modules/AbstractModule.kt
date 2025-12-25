@@ -5,6 +5,9 @@ import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.config.ConfigBase
 import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.data.ModuleSwitch
+import dev.lizainslie.pitohui.core.fs.BotFS
+import dev.lizainslie.pitohui.core.fs.ModuleTemp
+import dev.lizainslie.pitohui.core.fs.ModuleTempContext
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
@@ -23,11 +26,16 @@ abstract class AbstractModule(
     val tables: Set<Table> = emptySet(),
     val dependencies: Set<String> = emptySet(),
 ) {
+    val temp = ModuleTemp(
+        BotFS.Temp.modules.resolve(name),
+    )
     protected lateinit var bot: Bot
     protected val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     open fun onLoad() {}
-    open fun onUnload() {}
+    open fun onUnload() {
+        temp.cleanup()
+    }
     open fun onInit(bot: Bot) {
         this.bot = bot
     }
@@ -47,4 +55,18 @@ abstract class AbstractModule(
     fun supportsPlatform(platform: PlatformKey) =
         bot.platformAdapters.firstOrNull { it.key == platform }
             ?.let { supportsPlatform(it) } ?: false
+
+    fun <T: Any> withTempContext(block: ModuleTempContext.() -> T): T {
+        val context = temp.createContext()
+        val result = context.block()
+        context.cleanup()
+        return result
+    }
+
+    suspend fun <T : Any> withTempContextSuspend(block: suspend ModuleTempContext.() -> T): T {
+        val context = temp.createContext()
+        val result = context.block()
+        context.cleanup()
+        return result
+    }
 }

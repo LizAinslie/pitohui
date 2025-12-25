@@ -33,4 +33,22 @@ object BotFS {
         // create the modules directory if it doesn't exist
         if (!modulesDir.exists()) modulesDir.mkdirs()
     }
+
+    object Temp {
+        /**
+         * The directory for temporary files
+         */
+        val dir: File = File("${System.getProperty("java.io.tmpdir")}/pitohui").absoluteFile
+            .apply { if (!exists()) mkdirs() }
+
+        val modules = dir.resolve("modules")
+            .apply { if (!exists()) mkdirs() }
+
+        /**
+         * Cleans up all files in the temp directory
+         */
+        fun cleanup() {
+            dir.listFiles()?.forEach { it.deleteRecursively() }
+        }
+    }
 }

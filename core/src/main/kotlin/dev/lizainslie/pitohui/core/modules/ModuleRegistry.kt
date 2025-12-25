@@ -140,6 +140,13 @@ class ModuleRegistry(
         }
     }
 
+    suspend fun unloadAll() {
+        log.info("Unloading all modules.")
+        for (mod in loadedModules) {
+            unload(mod)
+        }
+    }
+
     suspend fun reload(name: String) {
         val mod = get(name) ?: return
         reload(mod)

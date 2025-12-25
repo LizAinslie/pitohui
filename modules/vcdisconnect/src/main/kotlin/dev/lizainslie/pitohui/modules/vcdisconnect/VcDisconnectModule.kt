@@ -1,9 +1,6 @@
 package dev.lizainslie.pitohui.modules.vcdisconnect
 
-import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
-import dev.kord.core.behavior.channel.VoiceChannelBehavior
 import dev.kord.core.behavior.edit
-import dev.kord.core.entity.channel.VoiceChannel
 import dev.kord.core.event.user.VoiceStateUpdateEvent
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.modules.AbstractModule
@@ -18,7 +15,6 @@ import dev.lizainslie.pitohui.util.task.startRepeatingTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.datetime.Clock
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SupportPlatforms(Discord::class)
