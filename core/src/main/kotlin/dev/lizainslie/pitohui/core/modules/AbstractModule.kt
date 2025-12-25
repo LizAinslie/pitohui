@@ -59,14 +59,14 @@ abstract class AbstractModule(
     fun <T: Any> withTempContext(block: ModuleTempContext.() -> T): T {
         val context = temp.createContext()
         val result = context.block()
-        context.cleanup()
+        temp.removeContext(context)
         return result
     }
 
     suspend fun <T : Any> withTempContextSuspend(block: suspend ModuleTempContext.() -> T): T {
         val context = temp.createContext()
         val result = context.block()
-        context.cleanup()
+        temp.removeContext(context)
         return result
     }
 }
