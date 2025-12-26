@@ -4,11 +4,11 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.config.ConfigBase
 import dev.lizainslie.pitohui.core.config.Configs
-import dev.lizainslie.pitohui.core.data.ModuleSwitch
+import dev.lizainslie.pitohui.core.data.entities.ModuleSwitch
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.fs.ModuleTemp
 import dev.lizainslie.pitohui.core.fs.ModuleTempContext
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
+import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
@@ -47,7 +47,7 @@ abstract class AbstractModule(
         supportsPlatform(communityId.platform) && ModuleSwitch.isModuleEnabled(communityId, name)
     }
 
-    fun supportsPlatform(platform: PlatformAdapter) =
+    fun supportsPlatform(platform: AnyPlatformAdapter) =
         this::class.annotations.filterIsInstance<SupportPlatforms>().any {
             it.platforms.contains(platform::class)
         }

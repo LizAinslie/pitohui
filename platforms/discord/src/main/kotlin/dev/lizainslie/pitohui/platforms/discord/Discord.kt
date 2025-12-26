@@ -17,7 +17,7 @@ import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.BaseCommand
-import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
+import dev.lizainslie.pitohui.core.commands.argument.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
@@ -26,6 +26,7 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
+import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandConfig
 import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
 import dev.lizainslie.pitohui.platforms.discord.extensions.subCommands
@@ -36,7 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.collections.find
 
-object Discord : PlatformAdapter(
+object Discord : PlatformAdapter<DiscordCommandConfig>(
     key = PlatformKey("discord"),
     displayName = "Discord"
 ) {
@@ -148,6 +149,13 @@ object Discord : PlatformAdapter(
                 command.name,
                 command.description,
             ) {
+                val commandConfig = command.platforms[key]
+                if (commandConfig != null && commandConfig is DiscordCommandConfig) {
+                    defaultMemberPermissions = commandConfig.defaultMemberPermissions
+                    dmPermission = commandConfig.dmPermission
+                    nsfw = commandConfig.nsfw
+                }
+
                 arguments(command.arguments)
 
                 subCommands(command.subCommands)
@@ -163,6 +171,12 @@ object Discord : PlatformAdapter(
                 command.name,
                 command.description,
             ) {
+                val commandConfig = command.platforms[key]
+                if (commandConfig != null && commandConfig is DiscordCommandConfig) {
+                    defaultMemberPermissions = commandConfig.defaultMemberPermissions
+                    nsfw = commandConfig.nsfw
+                }
+
                 arguments(command.arguments)
 
                 subCommands(command.subCommands)
@@ -213,6 +227,8 @@ object Discord : PlatformAdapter(
             }
         }
     }
+
+    override fun createEmptyCommandConfig() = DiscordCommandConfig()
 
     val myId get() = kord.selfId
 

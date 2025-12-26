@@ -1,0 +1,7 @@
+{
+  "defaultPrefix": ";",
+  "allowedArgumentDelimiters": [":", "="],
+  "requireArgumentNames": false,
+  "caseInsensitive": true,
+  "bannedPrefixes": []
+}

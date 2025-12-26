@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
 class Config<TConfig : ConfigBase>(
     val key: String,
     private val serializer: KSerializer<out TConfig>,
-    private val klass: KClass<out TConfig>,
+    klass: KClass<out TConfig>,
     val moduleName: String? = null
 ) {
     lateinit var currentValue: TConfig

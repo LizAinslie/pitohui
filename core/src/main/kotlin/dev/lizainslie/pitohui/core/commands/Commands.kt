@@ -1,7 +1,8 @@
 package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.Bot
-import dev.lizainslie.pitohui.core.data.DeveloperOptions
+import dev.lizainslie.pitohui.core.config.Configs
+import dev.lizainslie.pitohui.core.data.entities.DeveloperOptions
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
 import dev.lizainslie.pitohui.core.logging.suspendLogPlatform
 import dev.lizainslie.pitohui.core.logging.suspendLogTag
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory
 class Commands(
     private val bot: Bot
 ) {
+    val parsingConfig by Configs.config<CommandParsingConfig>()
     val commands = mutableListOf<CommandRegistration>()
     private val log = LoggerFactory.getLogger(javaClass)
 

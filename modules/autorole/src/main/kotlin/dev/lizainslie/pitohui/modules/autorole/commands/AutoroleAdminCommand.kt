@@ -1,7 +1,8 @@
 package dev.lizainslie.pitohui.modules.autorole.commands
 
 import dev.kord.common.entity.Permission
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.kord.common.entity.Permissions
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
@@ -14,7 +15,10 @@ val AutoroleAdminCommand = defineCommand(
     "autorole_admin",
     "Manage community autorole settings",
 ) {
-    platforms(Discord)
+    platform(Discord) {
+        defaultMemberPermissions = Permissions(Permission.ManageGuild)
+        dmPermission = false
+    }
     communityOnly = true
 
     subCommand(

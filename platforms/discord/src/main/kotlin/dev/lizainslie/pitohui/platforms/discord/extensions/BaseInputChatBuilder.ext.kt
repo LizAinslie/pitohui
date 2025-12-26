@@ -9,8 +9,8 @@ import dev.kord.rest.builder.interaction.role
 import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.interaction.subCommand
 import dev.kord.rest.builder.interaction.user
-import dev.lizainslie.pitohui.core.commands.ArgumentDescriptor
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.SubCommand
 import kotlin.collections.forEach
 

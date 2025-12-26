@@ -1,7 +1,7 @@
 package dev.lizainslie.pitohui.core.logging
 
 import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
+import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import org.slf4j.MDC
 
@@ -47,5 +47,5 @@ fun <T> logPlatform(platform: PlatformKey, block: () -> T): T {
     return result
 }
 
-suspend fun <T> suspendLogPlatform(platform: PlatformAdapter, block: suspend () -> T) = suspendLogPlatform(platform.key, block)
-fun <T> logPlatform(platform: PlatformAdapter, block: () -> T) = logPlatform(platform.key, block)
+suspend fun <T> suspendLogPlatform(platform: AnyPlatformAdapter, block: suspend () -> T) = suspendLogPlatform(platform.key, block)
+fun <T> logPlatform(platform: AnyPlatformAdapter, block: () -> T) = logPlatform(platform.key, block)

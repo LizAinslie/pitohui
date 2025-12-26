@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.modules.admin.commands
 
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.platforms.entities.PlatformResponse
 import dev.lizainslie.pitohui.modules.admin.AdminModule
@@ -16,7 +16,7 @@ val ShutdownCommand = defineCommand(
     name = "shutdown",
     description = "Shuts down the bot.",
 ) {
-    platforms(Discord)
+    platform(Discord)
 
     val delayArgument = argument(
         name = "after",

@@ -1,15 +1,18 @@
 package dev.lizainslie.pitohui.modules.admin.commands
 
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.modules.ModuleRegistry
 import dev.lizainslie.pitohui.core.modules.ModuleSource
+import dev.lizainslie.pitohui.platforms.discord.Discord
 
 val AdminModuleCommand = defineCommand(
     name = "admin_module",
     description = "Administrative commands for managing modules",
 ) {
+    platform(Discord)
+
     subCommand("reload", "Reload a module") {
         val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING, "all") {
             ModuleRegistry.instance.loadedModules

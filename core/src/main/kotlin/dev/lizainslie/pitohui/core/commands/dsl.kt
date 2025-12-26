@@ -1,7 +1,13 @@
+@file:OptIn(ExperimentalContracts::class)
 package dev.lizainslie.pitohui.core.commands
 
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentType
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 open class BaseCommandDsl(
     val name: String,
@@ -9,12 +15,7 @@ open class BaseCommandDsl(
 ) {
     lateinit var handler: CommandHandler
 
-    protected val platforms = mutableSetOf<PlatformKey>()
     protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
-
-    fun platforms(vararg platforms: PlatformAdapter) {
-        this.platforms.addAll(platforms.map { it.key })
-    }
 
     fun handle(block: CommandHandler) {
         handler = block
@@ -38,6 +39,7 @@ class RootCommandDsl(
     name: String,
     description: String,
 ) : BaseCommandDsl(name, description) {
+    private val platforms = mutableMapOf<PlatformKey, PlatformCommandConfig>()
     private val subCommands = mutableListOf<SubCommandDsl>()
     var communityOnly: Boolean = false
 
@@ -50,6 +52,12 @@ class RootCommandDsl(
         subCommands.add(command)
     }
 
+    fun <TCommandConfig : PlatformCommandConfig> platform(platform: PlatformAdapter<TCommandConfig>, configure: (TCommandConfig.() -> Unit) = {}) {
+        contract { callsInPlace(configure, InvocationKind.EXACTLY_ONCE) }
+        val commandConfig = platform.createEmptyCommandConfig().apply(configure)
+        this.platforms[platform.key] = commandConfig
+    }
+
     fun buildRoot(): RootCommand {
         // Capture properties to pass into the anonymous class
         val subCommands = subCommands
@@ -59,7 +67,7 @@ class RootCommandDsl(
 
         return object : RootCommand(name, description) {
             override val subCommands: List<SubCommand> = subCommands.map { it.buildSubCommand(this) }
-            override val platforms: Set<PlatformKey> = platforms
+            override val platforms: Map<PlatformKey, PlatformCommandConfig> = platforms
             override val arguments: List<ArgumentDescriptor<*>> = arguments
             override val communityOnly: Boolean = communityOnly
 
@@ -78,7 +86,6 @@ class SubCommandDsl(
         val arguments = arguments
 
         return object : SubCommand(name, description, parent) {
-            override val platforms: Set<PlatformKey> = parent.platforms
             override val arguments: List<ArgumentDescriptor<*>> = arguments
 
             override suspend fun handle(context: CommandContext) {
@@ -91,7 +98,8 @@ class SubCommandDsl(
 fun defineCommand(
     name: String,
     description: String,
-    block: RootCommandDsl.() -> Unit,
+    define: RootCommandDsl.() -> Unit,
 ): RootCommand {
-    return RootCommandDsl(name, description).apply(block).buildRoot()
+    contract { callsInPlace(define, InvocationKind.EXACTLY_ONCE) }
+    return RootCommandDsl(name, description).apply(define).buildRoot()
 }

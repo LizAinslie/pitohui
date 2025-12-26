@@ -3,19 +3,19 @@ package dev.lizainslie.pitohui.core
 import dev.lizainslie.pitohui.core.commands.Commands
 import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.data.DbContext
-import dev.lizainslie.pitohui.core.data.DeveloperOptionsTable
-import dev.lizainslie.pitohui.core.data.ModuleSwitchTable
+import dev.lizainslie.pitohui.core.data.tables.DeveloperOptionsTable
+import dev.lizainslie.pitohui.core.data.tables.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.logging.Logging
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleRegistry
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
+import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 
 class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
     val modules = ModuleRegistry(this)
     val commands = Commands(this)
 
-    val platformAdapters = mutableListOf<PlatformAdapter>()
+    val platformAdapters = mutableListOf<AnyPlatformAdapter>()
 
     init {
         // generate the base folder structure if it doesn't exist
@@ -40,13 +40,13 @@ class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
         modules.loadJarModules()
     }
 
-    fun enablePlatforms(vararg platforms: PlatformAdapter) {
+    fun enablePlatforms(vararg platforms: AnyPlatformAdapter) {
         platforms.forEach { adapter ->
             if (platformAdapters.none { it.key == adapter.key }) platformAdapters.add(adapter)
         }
     }
 
-    suspend fun eachPlatform(block: suspend (platformAdapter: PlatformAdapter) -> Unit) {
+    suspend fun eachPlatform(block: suspend (platformAdapter: AnyPlatformAdapter) -> Unit) {
         for (platform in platformAdapters) {
             block(platform)
         }

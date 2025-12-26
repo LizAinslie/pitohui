@@ -1,11 +1,11 @@
-package dev.lizainslie.pitohui.core.data
+package dev.lizainslie.pitohui.core.data.entities
 
+import dev.lizainslie.pitohui.core.data.tables.DeveloperOptionsTable
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
-import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
@@ -46,13 +46,4 @@ class DeveloperOptions(id: EntityID<CompositeID>) : CompositeEntity(id) {
             userId.platform
         )
     }
-}
-
-object DeveloperOptionsTable : CompositeIdTable("developer_options") {
-    val platform = varchar("platform", 32).entityId()
-    val userId = varchar("user_id", 255).uniqueIndex().entityId()
-    val stealth = bool("stealth").default(false)
-    val contextDebug = bool("context_debug").default(false)
-
-    override val primaryKey = PrimaryKey(platform, userId)
 }

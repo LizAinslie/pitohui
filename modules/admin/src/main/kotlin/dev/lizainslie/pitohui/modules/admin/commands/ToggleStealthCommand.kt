@@ -1,7 +1,7 @@
 package dev.lizainslie.pitohui.modules.admin.commands
 
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.core.data.DeveloperOptions
+import dev.lizainslie.pitohui.core.data.entities.DeveloperOptions
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -9,7 +9,7 @@ val ToggleStealthCommand = defineCommand(
     "toggle_stealth",
     "Toggle stealth / vanish mode for bot developers"
 ) {
-    platforms(Discord)
+    platform(Discord)
 
     handle {
         newSuspendedTransaction {

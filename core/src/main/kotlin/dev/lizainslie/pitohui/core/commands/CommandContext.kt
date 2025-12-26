@@ -1,8 +1,10 @@
 package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.Bot
-import dev.lizainslie.pitohui.core.data.DeveloperOptions
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.data.entities.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
+import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.entities.PlatformResponse
@@ -11,7 +13,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 abstract class CommandContext(
     val bot: Bot,
     val module: AbstractModule,
-    val platform: PlatformAdapter,
+    val platform: AnyPlatformAdapter,
 ) {
     open var response: PlatformResponse? = null
     abstract suspend fun respond(text: String): PlatformResponse

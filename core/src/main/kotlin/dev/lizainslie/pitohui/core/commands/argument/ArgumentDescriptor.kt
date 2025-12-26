@@ -1,5 +1,6 @@
-package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.core.commands.argument
 
+import dev.lizainslie.pitohui.core.commands.CommandContext
 import org.slf4j.LoggerFactory
 
 class ArgumentDescriptor<T>(

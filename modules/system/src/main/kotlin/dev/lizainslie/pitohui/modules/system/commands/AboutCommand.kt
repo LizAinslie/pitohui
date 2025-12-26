@@ -13,7 +13,7 @@ val AboutCommand = defineCommand(
     name = "info",
     description = "About the bot",
 ) {
-    platforms(Discord)
+    platform(Discord)
 
     handle {
         val thumbUrl = "https://btw.i-use-ar.ch/i/i3c8qlxducy87.gif"

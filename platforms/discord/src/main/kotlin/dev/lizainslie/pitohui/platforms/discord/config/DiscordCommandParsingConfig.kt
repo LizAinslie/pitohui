@@ -5,12 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DiscordCommandParsingConfig(
-    val defaultPrefix: String = ";",
     val allowMentionPrefix: Boolean = true,
-    val caseInsensitive: Boolean = true,
-    val bannedPrefixes: List<String> = emptyList()
+    val allowCustomGuildPrefixes: Boolean = true,
+    val allowCustomUserPrefixes: Boolean = true,
 ) : ConfigBase {
-    override fun validate(): Boolean {
-        return defaultPrefix.isNotBlank() && bannedPrefixes.all { it.isNotBlank() }
-    }
+    override fun validate() = true
 }

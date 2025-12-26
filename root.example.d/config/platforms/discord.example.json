@@ -9,5 +9,11 @@
     {
       "id": "some-other-id"
     }
-  ]
+  ],
+  "commandParsing": {
+    "enabled": true,
+    "allowMentionPrefix": true,
+    "allowCustomGuildPrefixes": true,
+    "allowCustomUserPrefixes": true
+  }
 }

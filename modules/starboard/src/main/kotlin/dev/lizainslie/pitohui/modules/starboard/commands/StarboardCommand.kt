@@ -1,7 +1,9 @@
 package dev.lizainslie.pitohui.modules.starboard.commands
 
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.core.entity.channel.MessageChannel
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.starboard.StarboardModule
 import dev.lizainslie.pitohui.modules.starboard.data.Starboard
@@ -17,7 +19,10 @@ val StarboardCommand = defineCommand(
     name = "starboard",
     description = "Manage the starboards in this community.",
 ) {
-    platforms(Discord)
+    platform(Discord) {
+        defaultMemberPermissions = Permissions(Permission.ManageGuild)
+        dmPermission = false
+    }
 
     communityOnly = true
 

@@ -1,10 +1,11 @@
 package dev.lizainslie.pitohui.modules.system.commands
 
 import dev.kord.common.entity.Permission
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.kord.common.entity.Permissions
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.core.data.ModuleSwitch
+import dev.lizainslie.pitohui.core.data.entities.ModuleSwitch
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.platforms.discord.Discord
@@ -43,7 +44,10 @@ suspend fun shouldListModule(module: AbstractModule, context: CommandContext) = 
 }
 
 val ModuleCommand = defineCommand("module", "Manage modules in your community") {
-    platforms(Discord)
+    platform(Discord) {
+        defaultMemberPermissions = Permissions(Permission.ManageGuild)
+        dmPermission = false
+    }
     communityOnly = true
 
     subCommand("list", "List all modules") {

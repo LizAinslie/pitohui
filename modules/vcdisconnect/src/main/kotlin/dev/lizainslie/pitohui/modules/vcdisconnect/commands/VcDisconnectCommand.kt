@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.modules.vcdisconnect.commands
 
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcdisconnect.VcDisconnectModule
 import dev.lizainslie.pitohui.modules.vcdisconnect.data.DisconnectTimer
@@ -15,8 +15,11 @@ val VcDisconnectCommand = defineCommand(
     "vcdisconnect",
     "Have the bot disconnect you from a voice channel after a specified duration."
 ) {
+    platform(Discord) {
+        dmPermission = false
+    }
+
     communityOnly = true
-    platforms(Discord)
 
     subCommand("set", "Set a timer to disconnect from a voice channel.") {
         val durationArgument = argument(

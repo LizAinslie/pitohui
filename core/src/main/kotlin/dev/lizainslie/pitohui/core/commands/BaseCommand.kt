@@ -1,6 +1,7 @@
 package dev.lizainslie.pitohui.core.commands
 
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 
 abstract class BaseCommand(
@@ -9,16 +10,14 @@ abstract class BaseCommand(
 ) {
     abstract val rootCommand: RootCommand
 
-    open val platforms: Set<PlatformKey> = emptySet()
     open val arguments: List<ArgumentDescriptor<*>> = emptyList()
 
     abstract suspend fun handle(context: CommandContext)
 
     fun supportsPlatform(key: PlatformKey) =
-        if (platforms.isEmpty()) true
-        else platforms.contains(key)
+        rootCommand.platforms.containsKey(key)
 
-    fun supportsPlatform(platform: PlatformAdapter) =
+    fun supportsPlatform(platform: AnyPlatformAdapter) =
         supportsPlatform(platform.key)
 }
 
@@ -26,6 +25,7 @@ abstract class RootCommand(
     name: String,
     description: String,
 ) : BaseCommand(name, description) {
+    abstract val platforms: Map<PlatformKey, PlatformCommandConfig>
     override val rootCommand = this
     open val communityOnly: Boolean = false
 
@@ -35,7 +35,7 @@ abstract class RootCommand(
 abstract class SubCommand(
     name: String,
     description: String,
-    val parent: BaseCommand,
+    parent: BaseCommand,
 ) : BaseCommand(name, description) {
     override val rootCommand = parent.rootCommand
 }

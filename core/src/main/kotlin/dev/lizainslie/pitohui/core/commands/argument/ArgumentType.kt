@@ -1,5 +1,6 @@
-package dev.lizainslie.pitohui.core.commands
+package dev.lizainslie.pitohui.core.commands.argument
 
+import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration

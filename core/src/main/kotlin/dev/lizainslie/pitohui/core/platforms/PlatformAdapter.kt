@@ -1,14 +1,17 @@
 package dev.lizainslie.pitohui.core.platforms
 
 import dev.lizainslie.pitohui.core.Bot
+import dev.lizainslie.pitohui.core.commands.PlatformCommandConfig
 import dev.lizainslie.pitohui.core.commands.RootCommand
-import dev.lizainslie.pitohui.core.commands.PlatformArgumentParseFn
+import dev.lizainslie.pitohui.core.commands.argument.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.logging.suspendLogPlatform
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-abstract class PlatformAdapter(
+abstract class PlatformAdapter<
+        TCommandConfig : PlatformCommandConfig
+>(
     val key: PlatformKey,
     val displayName: String
 ) {
@@ -31,4 +34,6 @@ abstract class PlatformAdapter(
     abstract suspend fun stop()
     abstract suspend fun registerCommand(command: RootCommand, module: AbstractModule)
     abstract suspend fun unregisterCommand(command: RootCommand, module: AbstractModule)
+
+    abstract fun createEmptyCommandConfig(): TCommandConfig
 }

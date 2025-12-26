@@ -1,7 +1,8 @@
 package dev.lizainslie.pitohui.modules.vcnotify.commands
 
 import dev.kord.common.entity.Permission
-import dev.lizainslie.pitohui.core.commands.ArgumentTypes
+import dev.kord.common.entity.Permissions
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
@@ -14,7 +15,11 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import kotlin.time.Duration.Companion.minutes
 
 val VcNotifyAdminCommand = defineCommand("vcnotify_admin", "Admin commands for the VcNotify module") {
-    platforms(Discord)
+    platform(Discord) {
+        defaultMemberPermissions = Permissions(Permission.ManageGuild)
+        dmPermission = false
+    }
+
     communityOnly = true
 
     subCommand("info", "Documentation for VcNotify") {
