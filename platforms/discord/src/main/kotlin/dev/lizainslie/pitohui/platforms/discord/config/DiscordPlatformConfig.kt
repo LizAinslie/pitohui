@@ -11,6 +11,7 @@ data class DiscordPlatformConfig(
     val token: String = "",
     val registerCommandsGlobally: Boolean = true,
     val guilds: List<DiscordGuildConfig> = emptyList(),
+    val commandParsing: DiscordCommandParsingConfig = DiscordCommandParsingConfig()
 ) : ConfigBase {
     override fun validate(): Boolean {
         return (token.trim().isNotBlank() && guilds.isNotEmpty() && guilds.all { it.validate() })
