@@ -2,10 +2,14 @@ package dev.lizainslie.pitohui.core.commands.argument
 
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.core.validation.Validator
+import dev.lizainslie.pitohui.core.validation.validators.StringValidators
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 
-interface ArgumentType<out T> {
+interface ArgumentType<T : Any> {
+    val baseValidators: List<Validator<T>> get() = emptyList()
+
     fun parse(value: Any, context: CommandContext): T
 
     fun tryParse(value: Any, context: CommandContext) =
@@ -17,7 +21,7 @@ interface ArgumentType<out T> {
             Result.failure(e)
         }
 
-    fun validate(value: Any, context: CommandContext) =
+    fun validate(value: T, context: CommandContext) =
         try {
             parse(value, context)
             true
@@ -28,6 +32,14 @@ interface ArgumentType<out T> {
 
 object ArgumentTypes {
     object STRING : ArgumentType<String> {
+        override fun parse(value: Any, context: CommandContext) =
+            value.toString()
+    }
+
+    object COLOR : ArgumentType<String> {
+        override val baseValidators: List<Validator<String>>
+            get() = listOf(StringValidators.HexColor)
+
         override fun parse(value: Any, context: CommandContext) =
             value.toString()
     }
