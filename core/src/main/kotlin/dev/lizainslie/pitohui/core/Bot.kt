@@ -7,6 +7,7 @@ import dev.lizainslie.pitohui.core.data.tables.DeveloperOptionsTable
 import dev.lizainslie.pitohui.core.data.tables.ModuleSwitchTable
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.logging.Logging
+import dev.lizainslie.pitohui.core.manual.ManualRegistry
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleRegistry
 import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
@@ -14,6 +15,7 @@ import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 class Bot(vararg val baseModules: AbstractModule = emptyArray()) {
     val modules = ModuleRegistry(this)
     val commands = Commands(this)
+    val manPages = ManualRegistry()
 
     val platformAdapters = mutableListOf<AnyPlatformAdapter>()
 

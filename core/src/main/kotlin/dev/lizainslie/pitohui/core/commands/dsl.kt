@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalContracts::class)
 package dev.lizainslie.pitohui.core.commands
 
+import dev.lizainslie.pitohui.core.annotations.PitohuiDsl
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentType
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
@@ -9,6 +10,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+@PitohuiDsl
 open class BaseCommandDsl(
     val name: String,
     val description: String,
@@ -35,6 +37,7 @@ open class BaseCommandDsl(
     }
 }
 
+@PitohuiDsl
 class RootCommandDsl(
     name: String,
     description: String,
@@ -78,6 +81,7 @@ class RootCommandDsl(
     }
 }
 
+@PitohuiDsl
 class SubCommandDsl(
     name: String,
     description: String,

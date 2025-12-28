@@ -8,6 +8,8 @@ import dev.lizainslie.pitohui.core.data.entities.ModuleSwitch
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.fs.ModuleTemp
 import dev.lizainslie.pitohui.core.fs.ModuleTempContext
+import dev.lizainslie.pitohui.core.manual.Manual
+import dev.lizainslie.pitohui.core.manual.ManualProvider
 import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
@@ -25,7 +27,7 @@ abstract class AbstractModule(
     val commands: Set<RootCommand> = emptySet(),
     val tables: Set<Table> = emptySet(),
     val dependencies: Set<String> = emptySet(),
-) {
+) : ManualProvider {
     val temp = ModuleTemp(
         BotFS.Temp.modules.resolve(name),
     )
@@ -68,5 +70,9 @@ abstract class AbstractModule(
         val result = context.block()
         temp.removeContext(context)
         return result
+    }
+
+    override fun registerManPage(man: Manual) {
+        bot.manPages.registerModuleManPage(this, man)
     }
 }

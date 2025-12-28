@@ -1,6 +1,7 @@
 package dev.lizainslie.pitohui.core.commands
 
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.manual.Manual
 import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 
@@ -28,6 +29,7 @@ abstract class RootCommand(
     abstract val platforms: Map<PlatformKey, PlatformCommandConfig>
     override val rootCommand = this
     open val communityOnly: Boolean = false
+    open val manual: Manual? = null
 
     open val subCommands: List<SubCommand> = emptyList()
 }

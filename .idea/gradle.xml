@@ -26,6 +26,7 @@
             <option value="$PROJECT_DIR$/modules" />
             <option value="$PROJECT_DIR$/modules/admin" />
             <option value="$PROJECT_DIR$/modules/autorole" />
+            <option value="$PROJECT_DIR$/modules/greeting" />
             <option value="$PROJECT_DIR$/modules/message-embedder" />
             <option value="$PROJECT_DIR$/modules/starboard" />
             <option value="$PROJECT_DIR$/modules/system" />
