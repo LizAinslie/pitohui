@@ -23,7 +23,7 @@ open class BaseCommandDsl(
         handler = block
     }
 
-    fun <T> argument(
+    fun <T : Any> argument(
         name: String,
         description: String,
         type: ArgumentType<T>,

@@ -39,7 +39,7 @@ abstract class CommandContext(
         if (callerIsStealth()) respondPrivate(text)
         else respond(text)
 
-    abstract fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T?
+    abstract fun <T : Any> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T?
 
     abstract val callerId: PlatformId
     abstract val communityId: PlatformId?
@@ -62,6 +62,6 @@ abstract class CommandContext(
     abstract suspend fun dump()
 
     class ArgumentMap(private val context: CommandContext) {
-        suspend operator fun <T> get(key: ArgumentDescriptor<T>): T? = key.resolve(context)
+        suspend operator fun <T : Any> get(key: ArgumentDescriptor<T>): T? = key.resolve(context)
     }
 }

@@ -10,15 +10,7 @@ interface Validator<in T: Any> {
      * Validate the given [value].
      *
      * @param value The value to validate.
-     * @return True if the value is valid, false otherwise.
+     * @return The [ValidationResult]
      */
-    fun validate(value: T): Boolean
-
-    /**
-     * Get an error message for the given invalid [value].
-     *
-     * @param value The invalid value.
-     * @return An error message describing why the value is invalid.
-     */
-    fun errorMessage(value: T): String = "Invalid value"
+    fun validate(value: T): ValidationResult
 }

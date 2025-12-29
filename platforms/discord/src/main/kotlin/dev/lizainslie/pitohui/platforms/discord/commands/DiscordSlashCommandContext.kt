@@ -67,7 +67,7 @@ class DiscordSlashCommandContext(
         return response as DiscordSlashCommandResponse
     }
 
-    override fun <T> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
+    override fun <T : Any> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
         val option = interaction.command.options[arg.name]
 
         return option?.value?.let {

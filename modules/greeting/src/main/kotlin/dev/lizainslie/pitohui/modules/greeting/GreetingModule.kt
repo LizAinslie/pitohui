@@ -92,7 +92,9 @@ object GreetingModule : AbstractModule(
     private suspend fun handleMemberLeave(communityId: PlatformId) {
         val settings = findSettings(communityId) ?: return
 
-        if (settings.goodbyeChannelId == null) return
+        val channel = settings.goodbyeChannelId?.let {
+            Discord.getChannelById(it)
+        } ?: return
     }
 
     /**

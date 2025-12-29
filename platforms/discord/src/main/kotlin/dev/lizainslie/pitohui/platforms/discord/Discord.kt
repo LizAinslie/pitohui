@@ -19,6 +19,7 @@ import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.BaseCommand
 import dev.lizainslie.pitohui.core.commands.argument.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
 import dev.lizainslie.pitohui.core.modules.AbstractModule
@@ -301,6 +302,18 @@ object Discord : PlatformAdapter<DiscordCommandConfig>(
 
                     handlingCommand = subCommand
                 }
+
+                val argumentToValueMap = mutableMapOf<ArgumentDescriptor<*>, Any?>()
+
+                for (argumentDescriptor in handlingCommand.arguments) {
+                    argumentToValueMap[argumentDescriptor] =
+                        interactionCmd.options[argumentDescriptor.name]?.value
+                }
+
+//                val preValidationResults =
+//                    argumentToValueMap.map { (argumentDescriptor, value) ->
+//                        argumentDescriptor.argumentType.preValidate()
+//                    }
 
                 bot.commands.dispatchCommand(
                     handlingCommand, DiscordSlashCommandContext(

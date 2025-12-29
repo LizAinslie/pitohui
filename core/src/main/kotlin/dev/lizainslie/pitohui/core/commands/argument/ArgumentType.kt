@@ -2,14 +2,16 @@ package dev.lizainslie.pitohui.core.commands.argument
 
 import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.core.validation.ValidationResult
 import dev.lizainslie.pitohui.core.validation.Validator
+import dev.lizainslie.pitohui.core.validation.buildValidators
+import dev.lizainslie.pitohui.core.validation.validateValue
 import dev.lizainslie.pitohui.core.validation.validators.StringValidators
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import kotlin.time.Duration
 
 interface ArgumentType<T : Any> {
-    val baseValidators: List<Validator<T>> get() = emptyList()
-
     fun parse(value: Any, context: CommandContext): T
 
     fun tryParse(value: Any, context: CommandContext) =
@@ -21,13 +23,15 @@ interface ArgumentType<T : Any> {
             Result.failure(e)
         }
 
-    fun validate(value: T, context: CommandContext) =
-        try {
-            parse(value, context)
-            true
-        } catch (e: Exception) {
-            false
-        }
+    val preValidator: Validator<Any>? get() = null
+
+    fun preValidate(value: Any) =
+        preValidator?.validate(value) ?: ValidationResult.Valid
+
+    fun validate(
+        value: T,
+        descriptor: ArgumentDescriptor<T>,
+    ) = descriptor.validator?.let { validateValue(value, it) } ?: ValidationResult.Valid
 }
 
 object ArgumentTypes {
@@ -36,12 +40,16 @@ object ArgumentTypes {
             value.toString()
     }
 
-    object COLOR : ArgumentType<String> {
-        override val baseValidators: List<Validator<String>>
-            get() = listOf(StringValidators.HexColor)
+    object COLOR : ArgumentType<Color> {
+        override val preValidator =
+            buildValidators<Any> {
+                isType<String> {
+                }
+            }
 
-        override fun parse(value: Any, context: CommandContext) =
-            value.toString()
+        @Throws(NumberFormatException::class)
+        override fun parse(value: Any, context: CommandContext): Color =
+            Color.decode(value.toString())
     }
 
     object INT : ArgumentType<Int> {
@@ -50,6 +58,7 @@ object ArgumentTypes {
     }
 
     object BOOLEAN : ArgumentType<Boolean> {
+        @Throws(IllegalArgumentException::class)
         override fun parse(value: Any, context: CommandContext) =
             when (value.toString().lowercase()) {
                 "true", "yes", "1" -> true
@@ -64,20 +73,23 @@ object ArgumentTypes {
     }
 
     object CHANNEL : ArgumentType<PlatformId> {
-        override fun parse(value: Any, context: CommandContext): PlatformId =
+        @Throws(IllegalArgumentException::class)
+        override fun parse(value: Any, context: CommandContext) =
             context.platform.channelArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support CHANNEL arguments.")
 
     }
 
     object ROLE : ArgumentType<PlatformId> {
-        override fun parse(value: Any, context: CommandContext): PlatformId =
+        @Throws(IllegalArgumentException::class)
+        override fun parse(value: Any, context: CommandContext) =
             context.platform.roleArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support ROLE arguments.")
     }
 
     object USER : ArgumentType<PlatformId> {
-        override fun parse(value: Any, context: CommandContext): PlatformId =
+        @Throws(IllegalArgumentException::class)
+        override fun parse(value: Any, context: CommandContext) =
             context.platform.userArgumentParser?.parse(value) ?:
             throw IllegalArgumentException("Platform ${context.platform.displayName} does not support USER arguments.")
     }
