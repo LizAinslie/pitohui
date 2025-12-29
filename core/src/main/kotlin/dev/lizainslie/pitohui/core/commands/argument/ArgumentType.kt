@@ -4,7 +4,7 @@ import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.validation.ValidationResult
 import dev.lizainslie.pitohui.core.validation.Validator
-import dev.lizainslie.pitohui.core.validation.buildValidators
+import dev.lizainslie.pitohui.core.validation.buildValidator
 import dev.lizainslie.pitohui.core.validation.hexColor
 import dev.lizainslie.pitohui.core.validation.validateValue
 import org.slf4j.LoggerFactory
@@ -42,7 +42,7 @@ object ArgumentTypes {
 
     object COLOR : ArgumentType<Color> {
         override val preValidator =
-            buildValidators<Any> {
+            buildValidator<Any> {
                 isType<String> {
                     hexColor()
                 }

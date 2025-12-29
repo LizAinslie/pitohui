@@ -18,6 +18,7 @@ include(":core")
 include(":platforms:discord")
 
 // Modules
+include(":modules:example-module")
 include(":modules:system")
 include(":modules:starboard")
 include(":modules:greeting")

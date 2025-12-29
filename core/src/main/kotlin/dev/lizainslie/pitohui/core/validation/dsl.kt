@@ -6,12 +6,13 @@ import dev.lizainslie.pitohui.core.validation.validators.CoercingValidator
 import dev.lizainslie.pitohui.core.validation.validators.StringValidators
 import dev.lizainslie.pitohui.core.validation.validators.composite.CompositeValidationMode
 import dev.lizainslie.pitohui.core.validation.validators.composite.CompositeValidator
+import dev.lizainslie.pitohui.core.validation.validators.generic.InCollectionValidator
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 private interface BaseValidationDsl<T : Any> {
-    fun buildValidator(): Validator<T>
+    fun finalValidator(): Validator<T>
 }
 
 @PitohuiDsl
@@ -35,7 +36,7 @@ class ValidationDsl<T : Any> : BaseValidationDsl<T> {
         contract { callsInPlace(compositeBuilder, InvocationKind.EXACTLY_ONCE) }
 
         val dsl = CompositeValidatorDsl<T>(mode).apply(compositeBuilder)
-        setValidator(dsl.buildValidator())
+        setValidator(dsl.finalValidator())
     }
 
     @Throws(IllegalStateException::class)
@@ -45,10 +46,10 @@ class ValidationDsl<T : Any> : BaseValidationDsl<T> {
         contract { callsInPlace(validationBuilder, InvocationKind.EXACTLY_ONCE) }
 
         val dsl = ValidationDsl<TNew>().apply(validationBuilder)
-        setValidator(CoercingValidator.create<T, TNew>(dsl.buildValidator()))
+        setValidator(CoercingValidator.create<T, TNew>(dsl.finalValidator()))
     }
 
-    override fun buildValidator(): Validator<T>  {
+    override fun finalValidator(): Validator<T>  {
         if (!validatorSet)
             throw IllegalStateException("You must set a validator!")
 
@@ -70,19 +71,29 @@ class CompositeValidatorDsl<T : Any>(
         addValidator(validator)
     }
 
-    override fun buildValidator() = CompositeValidator(mode, validators)
+    fun validator(validatorBuilder: ValidationDsl<T>.() -> Unit) {
+        contract { callsInPlace(validatorBuilder, InvocationKind.EXACTLY_ONCE) }
+        addValidator(buildValidator(validatorBuilder))
+    }
+
+    override fun finalValidator() = CompositeValidator(mode, validators)
 }
 
-fun <T : Any> buildValidators(
+fun <T : Any> buildValidator(
     validatorBuilder: ValidationDsl<T>.() -> Unit
 ): Validator<T> {
     contract { callsInPlace(validatorBuilder, InvocationKind.EXACTLY_ONCE) }
 
     val dsl = ValidationDsl<T>().apply(validatorBuilder)
-    return dsl.buildValidator()
+    return dsl.finalValidator()
 }
 
 @Throws(IllegalStateException::class)
 fun ValidationDsl<String>.hexColor(allowAlpha: Boolean = false) {
     setValidator(StringValidators.HexColor(allowAlpha))
+}
+
+@Throws(IllegalStateException::class)
+fun <T : Any> ValidationDsl<T>.isIn(collection: Collection<T>) {
+    setValidator(InCollectionValidator(collection))
 }

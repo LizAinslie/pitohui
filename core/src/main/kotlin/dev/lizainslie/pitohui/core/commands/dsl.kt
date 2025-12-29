@@ -8,7 +8,7 @@ import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
 import dev.lizainslie.pitohui.core.validation.ValidationDsl
 import dev.lizainslie.pitohui.core.validation.Validator
-import dev.lizainslie.pitohui.core.validation.buildValidators
+import dev.lizainslie.pitohui.core.validation.buildValidator
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -26,7 +26,7 @@ class ArgumentDsl<T : Any>(
 
     fun validate(builder: ValidationDsl<T>.() -> Unit) {
         contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
-        validator = buildValidators(builder)
+        validator = buildValidator(builder)
     }
 
     fun complete(completer: () -> List<String>) {
