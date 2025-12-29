@@ -19,12 +19,13 @@ val ShutdownCommand = defineCommand(
     platform(Discord)
 
     val delayArgument = argument(
-        name = "after",
-        description = "Delay before shutdown",
-        type = ArgumentTypes.DURATION,
-        required = false,
-        defaultValue = DEFAULT_SHUTDOWN_DELAY,
-    )
+        "after",
+        "Delay before shutdown",
+        ArgumentTypes.DURATION
+    ) {
+        required = false
+        defaultValue = DEFAULT_SHUTDOWN_DELAY
+    }
 
     handle {
         val delay = args[delayArgument] ?: DEFAULT_SHUTDOWN_DELAY

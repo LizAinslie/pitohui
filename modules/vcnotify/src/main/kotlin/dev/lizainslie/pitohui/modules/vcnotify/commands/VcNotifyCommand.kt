@@ -5,7 +5,7 @@ import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.vcnotify.VcNotifyModule
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifyRecord
-import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
+import dev.lizainslie.pitohui.modules.vcnotify.data.entities.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType

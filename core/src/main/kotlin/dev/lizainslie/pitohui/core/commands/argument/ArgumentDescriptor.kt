@@ -11,7 +11,7 @@ class ArgumentDescriptor<T : Any>(
     val defaultValue: T? = null,
     val required: Boolean = false,
     val validator: Validator<T>? = null,
-    val autoComplete: () -> List<String> = { emptyList() }
+    val autoComplete: (() -> List<String>)? = null
 ) {
     private val log = LoggerFactory.getLogger(this.javaClass)
 

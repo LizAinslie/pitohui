@@ -1,10 +1,10 @@
-package dev.lizainslie.pitohui.modules.starboard.data
+package dev.lizainslie.pitohui.modules.starboard.data.entities
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardEntryTable
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
-import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
@@ -58,16 +58,4 @@ class StarboardEntry(id: EntityID<CompositeID>) : CompositeEntity(id) {
             (StarboardEntryTable.starboardChannelMessageId eq starboardChannelMessageId.id)
         }.firstOrNull()
     }
-}
-
-object StarboardEntryTable : CompositeIdTable("starboard_entries") {
-    val platform = varchar("platform", 255).entityId()
-    val communityId = varchar("community_id", 255).entityId()
-    val starboardChannelId = varchar("starboard_channel_id", 255).entityId()
-    val starboardChannelMessageId = varchar("starboard_channel_message_id", 255).entityId()
-    val messageId = varchar("message_id", 255).entityId()
-    val channelId = varchar("channel_id", 255)
-    val starCount = integer("star_count")
-
-    override val primaryKey = PrimaryKey(platform, communityId, starboardChannelId, starboardChannelMessageId, messageId)
 }

@@ -4,7 +4,7 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettings
+import dev.lizainslie.pitohui.modules.vcnotify.data.entities.VcNotifySettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
@@ -42,7 +42,9 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
     }
 
     subCommand("setrole", "Set the role to be notified when a user runs the main command") {
-        val roleArgument = argument("role", "The role to set for notifications", ArgumentTypes.ROLE, required = true)
+        val roleArgument = argument("role", "The role to set for notifications", ArgumentTypes.ROLE) {
+            required = true
+        }
 
         handle {
             enforceDiscordType<DiscordCommandContext> {
@@ -81,7 +83,9 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
     }
 
     subCommand("setformat", "Set the message format for notifications") {
-        val formatArgument = argument("format", "The message format to set", ArgumentTypes.STRING, required = true)
+        val formatArgument = argument("format", "The message format to set", ArgumentTypes.STRING) {
+            required = true
+        }
 
         handle {
             enforceDiscordType<DiscordCommandContext> {
@@ -111,7 +115,9 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
 
     subCommand("setcooldown", "Set the cooldown duration for notifications") {
         val cooldownArgument =
-            argument("duration", "The cooldown duration", ArgumentTypes.DURATION, required = true)
+            argument("duration", "The cooldown duration", ArgumentTypes.DURATION) {
+                required = true
+            }
 
         handle {
             enforceDiscordType<DiscordCommandContext> {

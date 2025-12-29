@@ -25,9 +25,10 @@ val VcDisconnectCommand = defineCommand(
         val durationArgument = argument(
             "duration",
             "The duration (in minutes) after which to disconnect from the voice channel.",
-            ArgumentTypes.DURATION,
+            ArgumentTypes.DURATION
+        ) {
             required = true
-        )
+        }
 
         handle {
             enforceDiscord {

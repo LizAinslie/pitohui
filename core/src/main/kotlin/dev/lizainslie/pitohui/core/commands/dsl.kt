@@ -6,9 +6,43 @@ import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentType
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
+import dev.lizainslie.pitohui.core.validation.ValidationDsl
+import dev.lizainslie.pitohui.core.validation.Validator
+import dev.lizainslie.pitohui.core.validation.buildValidators
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+
+@PitohuiDsl
+class ArgumentDsl<T : Any>(
+    val name: String,
+    val description: String,
+    val type: ArgumentType<T>,
+) {
+    var defaultValue: T? = null
+    var required: Boolean = false
+    var validator: Validator<T>? = null
+    var autoCompleter: (() -> List<String>)? = null
+
+    fun validate(builder: ValidationDsl<T>.() -> Unit) {
+        contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
+        validator = buildValidators(builder)
+    }
+
+    fun complete(completer: () -> List<String>) {
+        autoCompleter = completer
+    }
+
+    fun buildDescriptor() = ArgumentDescriptor(
+        name = name,
+        description = description,
+        argumentType = type,
+        defaultValue = defaultValue,
+        required = required,
+        validator = validator,
+        autoComplete = autoCompleter,
+    )
+}
 
 @PitohuiDsl
 open class BaseCommandDsl(
@@ -16,7 +50,6 @@ open class BaseCommandDsl(
     val description: String,
 ) {
     lateinit var handler: CommandHandler
-
     protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
 
     fun handle(block: CommandHandler) {
@@ -27,11 +60,11 @@ open class BaseCommandDsl(
         name: String,
         description: String,
         type: ArgumentType<T>,
-        defaultValue: T? = null,
-        required: Boolean = false,
-        autoComplete: () -> List<String> = { emptyList() },
+        builder: ArgumentDsl<T>.() -> Unit = {}
     ): ArgumentDescriptor<T> {
-        val descriptor = ArgumentDescriptor(name, description, type, defaultValue, required)
+        contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
+        val dsl = ArgumentDsl(name, description, type).apply(builder)
+        val descriptor = dsl.buildDescriptor()
         arguments.add(descriptor)
         return descriptor
     }

@@ -74,7 +74,9 @@ val ModuleCommand = defineCommand("module", "Manage modules in your community") 
 
     subCommand("enable", "Enable a module") {
         val moduleNameArg =
-            argument("module_name", "The name of the module to enable", ArgumentTypes.STRING, required = true)
+            argument("module_name", "The name of the module to enable", ArgumentTypes.STRING) {
+                required = true
+            }
 
         handle {
             val moduleName = args[moduleNameArg]!!.lowercase()
@@ -118,7 +120,9 @@ val ModuleCommand = defineCommand("module", "Manage modules in your community") 
 
     subCommand("disable", "Disable a module") {
         val moduleNameArg =
-            argument("module_name", "The name of the module to disable", ArgumentTypes.STRING, required = true)
+            argument("module_name", "The name of the module to disable", ArgumentTypes.STRING) {
+                required = true
+            }
 
         handle {
             val moduleName = args[moduleNameArg]!!.lowercase()

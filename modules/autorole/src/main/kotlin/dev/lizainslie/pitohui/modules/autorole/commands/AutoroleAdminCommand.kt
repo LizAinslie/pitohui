@@ -4,7 +4,7 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
-import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettings
+import dev.lizainslie.pitohui.modules.autorole.data.entities.AutoroleSettings
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
@@ -19,13 +19,16 @@ val AutoroleAdminCommand = defineCommand(
         defaultMemberPermissions = Permissions(Permission.ManageGuild)
         dmPermission = false
     }
+
     communityOnly = true
 
     subCommand(
         "set_member_role",
         "Set the role to be assigned to new users",
     ) {
-        val roleArg = argument("role", "The role to apply to new users", ArgumentTypes.ROLE, required = true)
+        val roleArg = argument("role", "The role to apply to new users", ArgumentTypes.ROLE) {
+            required = true
+        }
 
         handle {
             enforceDiscordType<DiscordCommandContext> {
@@ -59,7 +62,9 @@ val AutoroleAdminCommand = defineCommand(
         "set_bot_role",
         "Set the role to be assigned to new bots",
     ) {
-        val roleArg = argument("role", "The role to apply to new bot", ArgumentTypes.ROLE, required = true)
+        val roleArg = argument("role", "The role to apply to new bot", ArgumentTypes.ROLE) {
+            required = true
+        }
 
         handle {
             enforceDiscordType<DiscordCommandContext> {

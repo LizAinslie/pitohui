@@ -5,8 +5,8 @@ import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.validation.ValidationResult
 import dev.lizainslie.pitohui.core.validation.Validator
 import dev.lizainslie.pitohui.core.validation.buildValidators
+import dev.lizainslie.pitohui.core.validation.hexColor
 import dev.lizainslie.pitohui.core.validation.validateValue
-import dev.lizainslie.pitohui.core.validation.validators.StringValidators
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import kotlin.time.Duration
@@ -44,6 +44,7 @@ object ArgumentTypes {
         override val preValidator =
             buildValidators<Any> {
                 isType<String> {
+                    hexColor()
                 }
             }
 

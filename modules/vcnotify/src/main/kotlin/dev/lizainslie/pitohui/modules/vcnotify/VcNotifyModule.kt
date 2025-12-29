@@ -6,7 +6,7 @@ import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import dev.lizainslie.pitohui.modules.vcnotify.commands.VcNotifyAdminCommand
 import dev.lizainslie.pitohui.modules.vcnotify.commands.VcNotifyCommand
 import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifyRecord
-import dev.lizainslie.pitohui.modules.vcnotify.data.VcNotifySettingsTable
+import dev.lizainslie.pitohui.modules.vcnotify.data.tables.VcNotifySettingsTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
 
 @SupportPlatforms(Discord::class)

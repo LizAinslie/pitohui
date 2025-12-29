@@ -3,6 +3,7 @@ package dev.lizainslie.pitohui.core.validation
 
 import dev.lizainslie.pitohui.core.annotations.PitohuiDsl
 import dev.lizainslie.pitohui.core.validation.validators.CoercingValidator
+import dev.lizainslie.pitohui.core.validation.validators.StringValidators
 import dev.lizainslie.pitohui.core.validation.validators.composite.CompositeValidationMode
 import dev.lizainslie.pitohui.core.validation.validators.composite.CompositeValidator
 import kotlin.contracts.ExperimentalContracts
@@ -79,4 +80,9 @@ fun <T : Any> buildValidators(
 
     val dsl = ValidationDsl<T>().apply(validatorBuilder)
     return dsl.buildValidator()
+}
+
+@Throws(IllegalStateException::class)
+fun ValidationDsl<String>.hexColor(allowAlpha: Boolean = false) {
+    setValidator(StringValidators.HexColor(allowAlpha))
 }

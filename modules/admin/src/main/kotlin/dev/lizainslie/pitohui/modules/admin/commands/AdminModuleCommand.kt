@@ -14,11 +14,15 @@ val AdminModuleCommand = defineCommand(
     platform(Discord)
 
     subCommand("reload", "Reload a module") {
-        val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING, "all") {
-            ModuleRegistry.instance.loadedModules
-                .filter { it.source == ModuleSource.EXTERNAL }
-                .map { it.name } +
-                    listOf("all")
+        val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING) {
+            defaultValue = "all"
+
+            complete {
+                ModuleRegistry.instance.loadedModules
+                    .filter { it.source == ModuleSource.EXTERNAL }
+                    .map { it.name } +
+                        listOf("all")
+            }
         }
 
         handle {

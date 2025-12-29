@@ -1,10 +1,10 @@
-package dev.lizainslie.pitohui.modules.autorole.data
+package dev.lizainslie.pitohui.modules.autorole.data.entities
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.modules.autorole.data.tables.AutoroleSettingsTable
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
-import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
@@ -19,7 +19,7 @@ class AutoroleSettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
             communityId: PlatformId,
             memberRole: String? = null,
             botRole: String? = null,
-        ) = new(CompositeID { id ->
+        ) = new(CompositeID.Companion { id ->
             id[AutoroleSettingsTable.platform] = communityId.platform.key
             id[AutoroleSettingsTable.communityId] = communityId.id
         }) {
@@ -32,13 +32,4 @@ class AutoroleSettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
                     (AutoroleSettingsTable.communityId eq communityId.id)
         }.firstOrNull()
     }
-}
-
-object AutoroleSettingsTable : CompositeIdTable("autorole_settings") {
-    val platform = varchar("platform", 255).entityId()
-    val communityId = varchar("community_id", 255).entityId()
-    val memberRoleId = varchar("member_role_id", 255).nullable()
-    val botRoleId = varchar("bot_role_id", 255).nullable()
-
-    override val primaryKey = PrimaryKey(platform, communityId)
 }

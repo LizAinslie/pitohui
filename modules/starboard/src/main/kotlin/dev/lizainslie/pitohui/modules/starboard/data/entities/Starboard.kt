@@ -1,15 +1,12 @@
-package dev.lizainslie.pitohui.modules.starboard.data
+package dev.lizainslie.pitohui.modules.starboard.data.entities
 
 import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardTable
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
 import org.jetbrains.exposed.dao.id.CompositeID
-import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
-
-const val DEFAULT_EMOJI = "star"
-const val DEFAULT_STAR_THRESHOLD = 5
 
 class Starboard(id: EntityID<CompositeID>) : CompositeEntity(id) {
     val platform by StarboardTable.platform
@@ -23,8 +20,8 @@ class Starboard(id: EntityID<CompositeID>) : CompositeEntity(id) {
         fun create(
             communityId: PlatformId,
             channelId: PlatformId,
-            starThreshold: Int = DEFAULT_STAR_THRESHOLD,
-            emoji: String = DEFAULT_EMOJI,
+            starThreshold: Int = StarboardTable.DEFAULT_STAR_THRESHOLD,
+            emoji: String = StarboardTable.DEFAULT_EMOJI,
             selfStarAllowed: Boolean = false,
         ) = new(CompositeID { id ->
             id[StarboardTable.platform] = communityId.platform.key
@@ -63,15 +60,4 @@ class Starboard(id: EntityID<CompositeID>) : CompositeEntity(id) {
             (StarboardTable.emoji eq emoji)
         }.any()
     }
-}
-
-object StarboardTable : CompositeIdTable("starboards") {
-    val platform = varchar("platform", 255).entityId()
-    val communityId = varchar("community_id", 255).entityId()
-    val channelId = varchar("channel_id", 255).entityId()
-    val starThreshold = integer("star_threshold").default(DEFAULT_STAR_THRESHOLD)
-    val emoji = varchar("emoji", 255).default(DEFAULT_EMOJI)
-    val selfStarAllowed = bool("self_star_allowed").default(false)
-
-    override val primaryKey = PrimaryKey(platform, communityId, channelId)
 }

@@ -6,8 +6,8 @@ import dev.kord.core.entity.channel.MessageChannel
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.modules.starboard.StarboardModule
-import dev.lizainslie.pitohui.modules.starboard.data.Starboard
-import dev.lizainslie.pitohui.modules.starboard.data.StarboardTable
+import dev.lizainslie.pitohui.modules.starboard.data.entities.Starboard
+import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscordType
@@ -27,10 +27,21 @@ val StarboardCommand = defineCommand(
     communityOnly = true
 
     subCommand("create", "Create a starboard in this community.") {
-        val channelArg = argument("channel", "The channel to use as the starboard.", ArgumentTypes.CHANNEL, required = true)
-        val thresholdArg = argument("threshold", "The number of stars required to post a message to the starboard.", ArgumentTypes.INT, defaultValue = 5)
-        val emojiArg = argument("emoji", "The emoji to use for starring messages.", ArgumentTypes.STRING, defaultValue = ":star:")
-        val selfStarArg = argument("self_star", "Whether to allow users to star their own messages.", ArgumentTypes.BOOLEAN, defaultValue = false)
+        val channelArg = argument("channel", "The channel to use as the starboard.", ArgumentTypes.CHANNEL) {
+            required = true
+        }
+
+        val thresholdArg = argument("threshold", "The number of stars required to post a message to the starboard.", ArgumentTypes.INT) {
+            defaultValue = 5
+        }
+
+        val emojiArg = argument("emoji", "The emoji to use for starring messages.", ArgumentTypes.STRING) {
+            defaultValue = "⭐️"
+        }
+
+        val selfStarArg = argument("self_star", "Whether to allow users to star their own messages.", ArgumentTypes.BOOLEAN) {
+            defaultValue = false
+        }
 
         handle {
             val channel = args[channelArg] ?: return@handle
@@ -95,7 +106,10 @@ val StarboardCommand = defineCommand(
     }
 
     subCommand("remove", "Remove the starboard from this community.") {
-        val channelArg = argument("channel", "The starboard channel to remove.", ArgumentTypes.CHANNEL, required = true)
+        val channelArg = argument("channel", "The starboard channel to remove.", ArgumentTypes.CHANNEL) {
+            required = true
+        }
+
         handle {
             val channel = args[channelArg] ?: return@handle
 

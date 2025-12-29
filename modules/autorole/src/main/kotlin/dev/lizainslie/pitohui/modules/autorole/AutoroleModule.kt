@@ -7,8 +7,8 @@ import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import dev.lizainslie.pitohui.modules.autorole.commands.AutoroleAdminCommand
-import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettings
-import dev.lizainslie.pitohui.modules.autorole.data.AutoroleSettingsTable
+import dev.lizainslie.pitohui.modules.autorole.data.entities.AutoroleSettings
+import dev.lizainslie.pitohui.modules.autorole.data.tables.AutoroleSettingsTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction

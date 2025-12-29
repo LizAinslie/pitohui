@@ -19,10 +19,10 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import dev.lizainslie.pitohui.modules.starboard.commands.StarboardCommand
-import dev.lizainslie.pitohui.modules.starboard.data.Starboard
-import dev.lizainslie.pitohui.modules.starboard.data.StarboardEntry
-import dev.lizainslie.pitohui.modules.starboard.data.StarboardEntryTable
-import dev.lizainslie.pitohui.modules.starboard.data.StarboardTable
+import dev.lizainslie.pitohui.modules.starboard.data.entities.Starboard
+import dev.lizainslie.pitohui.modules.starboard.data.entities.StarboardEntry
+import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardEntryTable
+import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.extensions.getIdentifier
 import dev.lizainslie.pitohui.platforms.discord.extensions.platform
