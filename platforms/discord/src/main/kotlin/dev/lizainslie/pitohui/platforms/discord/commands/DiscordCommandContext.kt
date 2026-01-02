@@ -36,7 +36,7 @@ abstract class DiscordCommandContext(
         if (!isInGuild) return false
         val member = getMember() ?: return false
         val perms = member.getPermissions()
-        return perms.contains(permissions)
+        return member.isOwner() or perms.contains(Permission.Administrator) or perms.contains(permissions)
     }
 
     suspend fun checkCallerPermission(permissions: Permissions): Boolean {
