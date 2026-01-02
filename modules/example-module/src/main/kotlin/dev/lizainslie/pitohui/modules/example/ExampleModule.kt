@@ -1,6 +1,5 @@
 package dev.lizainslie.pitohui.modules.example
 
-import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
@@ -22,5 +21,5 @@ object ExampleModule : AbstractModule(
     tables = setOf(),
     dependencies = setOf(SystemModule.name)
 ) {
-    val config by Configs.config<ExampleConfig>()
+    val config by config<ExampleConfig>()
 }
