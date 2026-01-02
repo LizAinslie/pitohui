@@ -1,4 +1,5 @@
 package dev.lizainslie.pitohui.core.modules
+// last incident: 2026/01/02
 
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.data.DbContext
@@ -45,7 +46,6 @@ class ModuleRegistry(
                 instance = module,
                 source = ModuleSource.INTERNAL,
                 classLoader = null,
-                jarFile = null,
             )
         )
     }
@@ -92,7 +92,6 @@ class ModuleRegistry(
                     instance = instance,
                     source = ModuleSource.EXTERNAL,
                     classLoader = cl,
-                    jarFile = file,
                 )
             )
         }
@@ -166,9 +165,11 @@ class ModuleRegistry(
 
             unload(mod)
 
-            val jar = mod.jarFile ?: run {
-                log.error("Module '$name' is missing its JAR file, cannot reload.")
-                return@suspendLogModule
+            val jar = BotFS.modulesDir.resolve("${mod.name}.jar").also {
+                if (!it.exists()) run {
+                    log.error("Module '$name' is missing its JAR file, cannot reload.")
+                    return@suspendLogModule
+                }
             }
 
             loadExternalModule(jar)

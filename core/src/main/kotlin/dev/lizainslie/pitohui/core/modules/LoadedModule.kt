@@ -7,5 +7,4 @@ data class LoadedModule(
     val instance: AbstractModule,
     val classLoader: ModuleClassLoader?,
     val source: ModuleSource,
-    val jarFile: File?,
 )
