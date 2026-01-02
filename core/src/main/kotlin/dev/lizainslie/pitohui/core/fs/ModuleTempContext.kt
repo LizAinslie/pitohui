@@ -6,7 +6,10 @@ import java.util.UUID
 class ModuleTempContext(parent: ModuleTemp) {
     val uuid: UUID = UUID.randomUUID()
     val directory: File = File(parent.directory, uuid.toString())
-        .also { it.mkdirs() }
+
+    init {
+        directory.mkdirs()
+    }
 
     fun cleanup() {
         directory.deleteRecursively()

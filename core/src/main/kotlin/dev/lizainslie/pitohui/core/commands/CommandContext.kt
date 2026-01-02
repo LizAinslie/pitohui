@@ -5,7 +5,6 @@ import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.data.entities.DeveloperOptions
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.AnyPlatformAdapter
-import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.entities.PlatformResponse
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
