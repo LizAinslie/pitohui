@@ -9,12 +9,14 @@ import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.entities.PlatformResponse
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.slf4j.LoggerFactory
 
 abstract class CommandContext(
     val bot: Bot,
     val module: AbstractModule,
     val platform: AnyPlatformAdapter,
 ) {
+    protected val log = LoggerFactory.getLogger(javaClass)
     open var response: PlatformResponse? = null
     abstract suspend fun respond(text: String): PlatformResponse
     abstract suspend fun respondPrivate(text: String): PlatformResponse
