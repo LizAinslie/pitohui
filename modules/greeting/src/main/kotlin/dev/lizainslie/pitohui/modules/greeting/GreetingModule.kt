@@ -1,5 +1,6 @@
 package dev.lizainslie.pitohui.modules.greeting
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.event.guild.MemberJoinEvent
@@ -38,13 +39,15 @@ object GreetingModule : AbstractModule(
 
         Discord.addEventListener<MemberJoinEvent> {
              handleMemberJoin(
-                 communityId = guildId.platform
+                 communityId = guildId.platform,
+                 userId = member.id
              )
         }
 
         Discord.addEventListener<MemberLeaveEvent> {
             handleMemberLeave(
-                communityId = guildId.platform
+                communityId = guildId.platform,
+                userId = user.id
             )
         }
     }
@@ -53,8 +56,9 @@ object GreetingModule : AbstractModule(
      * Handle the [MemberJoinEvent] and send a welcome message if configured.
      *
      * @param communityId The ID of the community where the member joined.
+     * @param userId The Snowflake ID of the member that joined.
      */
-    private suspend fun handleMemberJoin(communityId: PlatformId) {
+    private suspend fun handleMemberJoin(communityId: PlatformId, userId: Snowflake) {
         val settings = findSettings(communityId) ?: return
 
         val channel = settings.welcomeChannelId?.let {
@@ -62,7 +66,7 @@ object GreetingModule : AbstractModule(
         } ?: return
 
         val placeholders = placeholders {
-            replace("user_mention", "")
+            replace("user_mention", "<@$userId>")
         }
 
         if (channel is MessageChannel) {
@@ -149,8 +153,9 @@ object GreetingModule : AbstractModule(
      * Handle the [MemberLeaveEvent] and send a goodbye message if configured.
      *
      * @param communityId The ID of the community where the member left.
+     * @param userId The Snowflake ID of the member that left.
      */
-    private suspend fun handleMemberLeave(communityId: PlatformId) {
+    private suspend fun handleMemberLeave(communityId: PlatformId, userId: Snowflake) {
         val settings = findSettings(communityId) ?: return
 
         val channel = settings.goodbyeChannelId?.let {
