@@ -11,5 +11,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
     implementation(libs.slf4jApi)
+    implementation(libs.bundles.okhttp)
+    implementation(libs.okio)
     testImplementation(kotlin("test"))
 }
