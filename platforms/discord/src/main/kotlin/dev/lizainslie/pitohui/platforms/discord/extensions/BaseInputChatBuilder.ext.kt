@@ -17,7 +17,7 @@ import kotlin.collections.forEach
 fun BaseInputChatBuilder.arguments(arguments: List<ArgumentDescriptor<*>>) {
     arguments.forEach { argument ->
         when (argument.argumentType) {
-            is ArgumentTypes.STRING, ArgumentTypes.DURATION -> {
+            is ArgumentTypes.STRING, ArgumentTypes.DURATION, ArgumentTypes.COLOR -> {
                 string(argument.name, argument.description) {
                     required = argument.required
                 }
