@@ -161,6 +161,89 @@ object GreetingModule : AbstractModule(
         val channel = settings.goodbyeChannelId?.let {
             Discord.getChannelById(it)
         } ?: return
+
+        val placeholders = placeholders {
+            replace("user_mention", "<@$userId>")
+        }
+
+        if (channel is MessageChannel) {
+            withTempContextSuspend {
+                channel.createMessage {
+                    if (settings.embedGoodbye) {
+                        embed {
+                            settings.goodbyeMessage?.let {
+                                description = placeholders.replace(it)
+                            }
+
+                            settings.goodbyeColor?.let {
+                                color = Color.decode(it).kordColor
+                            }
+
+                            settings.goodbyeImageUrl?.let {
+                                image = it
+                            }
+
+                            timestamp = Clock.System.now()
+                        }
+                    } else {
+                        settings.goodbyeMessage?.let {
+                            content = placeholders.replace(it)
+                        }
+
+                        settings.goodbyeImageUrl?.let {
+                            val tmpImg = file("goodbye-image_${communityId.id}")
+
+                            val httpClient = OkHttpClient()
+                            val request = Request.Builder()
+                                .url(it)
+                                .build()
+
+                            httpClient.newCall(request).execute().use { response ->
+                                if (!response.isSuccessful) {
+                                    log.warn("Received HTTP ${response.code} trying to download goodbye image")
+                                    return@let
+                                }
+
+                                val body = response.body ?: run {
+                                    log.warn("Downloaded goodbye image but there's no body (wtf??)")
+                                    return@let
+                                }
+
+                                val bodyType = body.contentType()
+                                    ?: response.header("Content-Type")?.toMediaTypeOrNull()
+                                    ?: run {
+                                        log.warn("Downloaded goodbye image but cannot determine image type")
+                                        return@let
+                                    }
+
+                                if (bodyType.type != "image") {
+                                    log.warn("Downloaded goodbye image but non-image content detected")
+                                    return@let
+                                }
+
+                                val imgFileExt = when (bodyType.subtype) {
+                                    "png" -> "png"
+                                    "jpg", "jpeg" -> "jpg"
+                                    "gif" -> "gif"
+                                    "webp" -> "webp"
+                                    else -> throw Exception("Goodbye image is unknown image subtype ${bodyType.subtype}")
+                                }
+
+                                tmpImg.outputStream().use { fileOut ->
+                                    body.byteStream().use { fileIn ->
+                                        fileIn.copyTo(fileOut)
+                                    }
+                                }
+
+                                addFile(tmpImg.toPath()) {
+                                    filename = "goodbye-image.$imgFileExt"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

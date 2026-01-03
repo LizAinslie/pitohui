@@ -146,6 +146,13 @@ class ModuleRegistry(
         }
     }
 
+    suspend fun unloadExternal() {
+        log.info("Unloading all external modules.")
+        for (mod in loadedModules.filter { it.source == ModuleSource.EXTERNAL }) {
+            unload(mod)
+        }
+    }
+
     suspend fun reload(name: String) {
         val mod = get(name) ?: return
         reload(mod)

@@ -50,6 +50,49 @@ val AdminModuleCommand = defineCommand(
         }
     }
 
+    subCommand("unload", "Unload a module") {
+        val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING) {
+            defaultValue = "all"
+
+            complete {
+                ModuleRegistry.instance.loadedModules
+                    .filter { it.source == ModuleSource.EXTERNAL }
+                    .map { it.name } +
+                        listOf("all")
+            }
+        }
+
+        handle {
+            var moduleName = args[moduleNameArg]
+
+            when (moduleName) {
+                null,
+                "all" -> {
+                    val response = respond("Unloading all external modules...")
+                    ModuleRegistry.instance.unloadExternal()
+                    response.createFollowup("All external modules unloaded.")
+                }
+
+                else -> {
+                    val module = ModuleRegistry.instance.get(moduleName)
+                    if (module == null) {
+                        respondError("Module `$moduleName` is not loaded.")
+                        return@handle
+                    }
+
+                    if (module.source == ModuleSource.INTERNAL) {
+                        respondError("Module `$moduleName` is internal and cannot be unloaded.")
+                        return@handle
+                    }
+
+                    val response = respond("Unloading module `$moduleName`...")
+                    ModuleRegistry.instance.unload(moduleName)
+                    response.createFollowup("Module `$moduleName` unloaded.")
+                }
+            }
+        }
+    }
+
     subCommand("list", "List all loaded modules") {
         handle {
             val modules = ModuleRegistry.instance.loadedModules
