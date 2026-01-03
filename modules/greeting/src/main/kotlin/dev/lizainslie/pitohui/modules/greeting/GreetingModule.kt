@@ -1,8 +1,5 @@
 package dev.lizainslie.pitohui.modules.greeting
 
-// todo: configuration commands
-// todo: test commands (/greeting test @user) that manually trigger the handlers
-
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.channel.MessageChannel
