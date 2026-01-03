@@ -1,0 +1,11 @@
+services: 
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: pitohui
+      POSTGRES_PASSWORD: pitohui
+    ports:
+      - 15432:5432
+    volumes:
+      - ./pg_data:/var/lib/postgresql
