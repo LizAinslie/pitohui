@@ -8,6 +8,7 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.commands.argument.ResolvedArguments
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.entities.DiscordSlashCommandResponse
@@ -17,9 +18,9 @@ import kotlinx.datetime.Clock
 class DiscordSlashCommandContext(
     bot: Bot,
     module: AbstractModule,
-
+    arguments: ResolvedArguments,
     val interaction: ChatInputCommandInteraction
-) : DiscordCommandContext(bot, module) {
+) : DiscordCommandContext(bot, module, arguments) {
     override suspend fun respond(text: String): DiscordSlashCommandResponse {
         val kordResponse = interaction.respondPublic {
             content = text
@@ -67,13 +68,13 @@ class DiscordSlashCommandContext(
         return response as DiscordSlashCommandResponse
     }
 
-    override fun <T : Any> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
-        val option = interaction.command.options[arg.name]
-
-        return option?.value?.let {
-            arg.argumentType.tryParse(it, this).getOrDefault(arg.defaultValue)
-        }
-    }
+//    override fun <T : Any> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
+//        val option = interaction.command.options[arg.name]
+//
+//        return option?.value?.let {
+//            arg.argumentType.tryParse(it, this.platform).getOrDefault(arg.defaultValue)
+//        }
+//    }
 
     override suspend fun dump() {
         val stealth = callerIsStealth()

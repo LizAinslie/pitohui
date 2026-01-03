@@ -6,3 +6,4 @@ cp ../modules/autorole/build/libs/autorole.jar ./modules/autorole.jar
 cp ../modules/vcnotify/build/libs/vcnotify.jar ./modules/vcnotify.jar
 cp ../modules/vcdisconnect/build/libs/vcdisconnect.jar ./modules/vcdisconnect.jar
 cp ../modules/starboard/build/libs/starboard.jar ./modules/starboard.jar
+cp ../modules/greeting/build/libs/greeting.jar ./modules/greeting.jar

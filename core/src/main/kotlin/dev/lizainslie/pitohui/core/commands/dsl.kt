@@ -12,9 +12,11 @@ import dev.lizainslie.pitohui.core.validation.buildValidator
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.KClass
 
 @PitohuiDsl
 class ArgumentDsl<T : Any>(
+    val tClass: KClass<T>,
     val name: String,
     val description: String,
     val type: ArgumentType<T>,
@@ -34,6 +36,7 @@ class ArgumentDsl<T : Any>(
     }
 
     fun buildDescriptor() = ArgumentDescriptor(
+        tClass = tClass,
         name = name,
         description = description,
         argumentType = type,
@@ -50,20 +53,20 @@ open class BaseCommandDsl(
     val description: String,
 ) {
     lateinit var handler: CommandHandler
-    protected val arguments = mutableListOf<ArgumentDescriptor<*>>()
+    val arguments = mutableListOf<ArgumentDescriptor<*>>()
 
     fun handle(block: CommandHandler) {
         handler = block
     }
 
-    fun <T : Any> argument(
+    inline fun <reified T : Any> argument(
         name: String,
         description: String,
         type: ArgumentType<T>,
         builder: ArgumentDsl<T>.() -> Unit = {}
     ): ArgumentDescriptor<T> {
         contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
-        val dsl = ArgumentDsl(name, description, type).apply(builder)
+        val dsl = ArgumentDsl( T::class, name, description, type).apply(builder)
         val descriptor = dsl.buildDescriptor()
         arguments.add(descriptor)
         return descriptor

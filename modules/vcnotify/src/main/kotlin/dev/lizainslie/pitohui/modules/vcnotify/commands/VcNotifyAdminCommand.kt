@@ -47,17 +47,12 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         }
 
         handle {
+            val roleId by roleArgument.require()
+
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("You do not have permission to manage VcNotify settings.")
-                        return@enforceGuild
-                    }
-
-                    val roleId = args[roleArgument]
-
-                    if (roleId == null) {
-                        respondError("Invalid role specified. Please provide a valid role.")
                         return@enforceGuild
                     }
 
@@ -88,6 +83,8 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
         }
 
         handle {
+            val messageFormat by formatArgument
+
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
@@ -103,8 +100,7 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
                         if (settings == null)
                             settings = VcNotifySettings.create(communityId)
 
-                        settings.messageFormat =
-                            args[formatArgument] ?: "{role} {user} is now in {channelLink}! Join them!"
+                        settings.messageFormat = messageFormat ?: "{role} {user} is now in {channelLink}! Join them!"
 
                         respondPrivate("Notification message format set to: `${settings.messageFormat}`")
                     }
@@ -116,10 +112,12 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
     subCommand("setcooldown", "Set the cooldown duration for notifications") {
         val cooldownArgument =
             argument("duration", "The cooldown duration", ArgumentTypes.DURATION) {
-                required = true
+                defaultValue = 30.minutes
             }
 
         handle {
+            val cooldown by cooldownArgument.require()
+
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
                     if (!checkCallerPermission(Permission.ManageGuild)) {
@@ -135,7 +133,6 @@ To customize the cooldown, you can run `/vcnotify_admin setcooldown <duration>`,
                         if (settings == null)
                             settings = VcNotifySettings.create(communityId)
 
-                        val cooldown = args[cooldownArgument] ?: 30.minutes
                         settings.cooldown = cooldown
 
                         respondPrivate("Notification cooldown set to ${settings.cooldown.format()}.")

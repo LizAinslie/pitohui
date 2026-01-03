@@ -1,10 +1,11 @@
 package dev.lizainslie.pitohui.core.commands.argument
 
-import dev.lizainslie.pitohui.core.commands.CommandContext
 import dev.lizainslie.pitohui.core.validation.Validator
 import org.slf4j.LoggerFactory
+import kotlin.reflect.KClass
 
 class ArgumentDescriptor<T : Any>(
+    val tClass: KClass<T>,
     val name: String,
     val description: String,
     val argumentType: ArgumentType<T>,
@@ -15,31 +16,52 @@ class ArgumentDescriptor<T : Any>(
 ) {
     private val log = LoggerFactory.getLogger(this.javaClass)
 
-    suspend fun resolve(commandContext: CommandContext): T? {
-        log.debug("Resolving argument `$name` with type `${argumentType::class.simpleName}`")
-
-        val value = commandContext.resolveRawArgumentValue(this)
-        log.debug("Resolved value: `{}`", value)
-
-        if (value == null && required) {
-            val error = "Option `$name` is required and no default value is provided"
-            commandContext.respondError(error)
-            throw IllegalArgumentException(error)
-        }
-
-//        value?.let {
-//            val validationResult = argumentType.validate(it, this)
-//            if (!validationResult.valid) {
-//                val errorMessage = buildString {
-//                    appendLine("Error${if (validationResult.errors.size != 1) "s" else ""} while validating command argument")
+//    suspend fun resolve(commandContext: CommandContext): T? {
+//        log.debug("Resolving argument `$name` with type `${argumentType::class.simpleName}`")
 //
-//                    for (error in validationResult.errors) {
-//                        appendLine(error)
-//                    }
-//                }
-//            }
+//        val value = commandContext.resolveRawArgumentValue(this)
+//        log.debug("Resolved value: `{}`", value)
+//
+//        if (value == null && required) {
+//            val error = "Option `$name` is required and no default value is provided"
+//            commandContext.respondError(error)
+//            throw IllegalArgumentException(error)
 //        }
+//
+////        value?.let {
+////            val validationResult = argumentType.validate(it, this)
+////            if (!validationResult.valid) {
+////                val errorMessage = buildString {
+////                    appendLine("Error${if (validationResult.errors.size != 1) "s" else ""} while validating command argument")
+////
+////                    for (error in validationResult.errors) {
+////                        appendLine(error)
+////                    }
+////                }
+////            }
+////        }
+//
+//        return value
+//    }
 
-        return value
+    companion object {
+        inline operator fun <reified T : Any> invoke(
+            name: String,
+            description: String,
+            argumentType: ArgumentType<T>,
+            defaultValue: T? = null,
+            required: Boolean = false,
+            validator: Validator<T>? = null,
+            noinline autoComplete: (() -> List<String>)? = null
+        ) = ArgumentDescriptor(
+            tClass = T::class,
+            name = name,
+            description = description,
+            argumentType = argumentType,
+            defaultValue = defaultValue,
+            required = required,
+            validator = validator,
+            autoComplete = autoComplete
+        )
     }
 }

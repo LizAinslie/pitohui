@@ -45,6 +45,7 @@ bin/
 .DS_Store
 
 root.example.d/bot.jar
+root.example.d/pg_data
 root.example.d/config/database.json
 root.example.d/config/logging.json
 root.example.d/config/command_parsing.json

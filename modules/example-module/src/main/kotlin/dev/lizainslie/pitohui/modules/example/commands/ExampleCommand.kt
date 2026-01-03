@@ -47,7 +47,7 @@ val ExampleCommand = defineCommand("example", "An example command") {
         }
 
         handle {
-            val myStr = args[stringArg]!!
+            val myStr by stringArg.require()
 
             val response = respond("You entered: $myStr")
             response.edit("But now you will never remember it!!")

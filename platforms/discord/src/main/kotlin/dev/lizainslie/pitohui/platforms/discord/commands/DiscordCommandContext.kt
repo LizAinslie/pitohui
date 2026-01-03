@@ -6,6 +6,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.CommandContext
+import dev.lizainslie.pitohui.core.commands.argument.ResolvedArguments
 import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.platforms.discord.Discord
@@ -15,7 +16,8 @@ import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
 abstract class DiscordCommandContext(
     bot: Bot,
     module: AbstractModule,
-) : CommandContext(bot, module, Discord) {
+    arguments: ResolvedArguments,
+) : CommandContext(bot, module, Discord, arguments) {
     abstract val channelId: PlatformId
     abstract val guildId: PlatformId?
     abstract val isInGuild: Boolean

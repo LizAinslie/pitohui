@@ -4,10 +4,12 @@ import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.platforms.discord.Discord
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandContext
 
-val BOT_DESCRIPTION = """Pitohui is a multi-platform bot for Discord, and more coming soon. It is designed to
-be modular and extensible, allowing for easy addition of new features. However,
-Pito is not publicly available nor is it designed to be. It is a personal
-project that you can customize and host yourself if you like, however."""
+val BOT_DESCRIPTION =
+    """Pitohui is a multi-platform bot for Discord, and more coming soon. It is designed to
+    |be modular and extensible, allowing for easy addition of new features. However,
+    |Pito is not publicly available nor is it designed to be. It is a personal
+    |project that you can customize and host yourself if you like, however.""".trimMargin()
+        .replace("\n", " ")
 
 val AboutCommand = defineCommand(
     name = "info",

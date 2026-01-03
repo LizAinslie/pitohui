@@ -23,12 +23,11 @@ val ShutdownCommand = defineCommand(
         "Delay before shutdown",
         ArgumentTypes.DURATION
     ) {
-        required = false
         defaultValue = DEFAULT_SHUTDOWN_DELAY
     }
 
     handle {
-        val delay = args[delayArgument] ?: DEFAULT_SHUTDOWN_DELAY
+        val delay by delayArgument.require()
 
         var response: PlatformResponse? = null
 

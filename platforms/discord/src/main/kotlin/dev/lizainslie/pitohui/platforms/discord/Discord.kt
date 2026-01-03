@@ -15,11 +15,14 @@ import dev.kord.core.on
 import dev.kord.gateway.ALL
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.builder.message.embed
 import dev.lizainslie.pitohui.core.Bot
 import dev.lizainslie.pitohui.core.commands.BaseCommand
 import dev.lizainslie.pitohui.core.commands.argument.PlatformArgumentParseFn
 import dev.lizainslie.pitohui.core.commands.RootCommand
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
+import dev.lizainslie.pitohui.core.commands.argument.ResolvedArgument
+import dev.lizainslie.pitohui.core.commands.argument.ResolvedArguments
 import dev.lizainslie.pitohui.core.config.Configs
 import dev.lizainslie.pitohui.core.logging.suspendLogModule
 import dev.lizainslie.pitohui.core.modules.AbstractModule
@@ -27,6 +30,8 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformAdapter
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.PlatformKey
+import dev.lizainslie.pitohui.core.validation.ValidationResult
+import dev.lizainslie.pitohui.core.validation.collapseResultsAll
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordCommandConfig
 import dev.lizainslie.pitohui.platforms.discord.extensions.arguments
 import dev.lizainslie.pitohui.platforms.discord.commands.DiscordSlashCommandContext
@@ -307,18 +312,76 @@ object Discord : PlatformAdapter<DiscordCommandConfig>(
 
                 for (argumentDescriptor in handlingCommand.arguments) {
                     argumentToValueMap[argumentDescriptor] =
-                        interactionCmd.options[argumentDescriptor.name]?.value
+                        interactionCmd.options[argumentDescriptor.name]?.value ?: argumentDescriptor.defaultValue
                 }
 
-//                val preValidationResults =
-//                    argumentToValueMap.map { (argumentDescriptor, value) ->
-//                        argumentDescriptor.argumentType.preValidate()
-//                    }
+                val preValidationResults = mapOf(*argumentToValueMap.map { (argumentDescriptor, value) ->
+                    if (argumentDescriptor.required && value == null) {
+                        ValidationResult.Invalid(listOf("Argument ${argumentDescriptor.name} was required and not provided"))
+                    }
+
+                    val validationValue = value ?: argumentDescriptor.defaultValue
+
+                    argumentDescriptor.name to (validationValue?.let {
+                        argumentDescriptor.argumentType.preValidate(it)
+                    } ?: ValidationResult.Valid)
+                }.toTypedArray())
+
+                if (preValidationResults.values.any { it is ValidationResult.Invalid }) {
+                    interaction.respondEphemeral {
+                        embed {
+                            title = "Command arguments failed pre-validation"
+
+                            preValidationResults
+                                .forEach { (argumentName, validationResult) ->
+                                    if (validationResult is ValidationResult.Invalid) {
+                                        field {
+                                            name = argumentName
+                                            value = validationResult.errors.joinToString("\n") {
+                                                "- `$it`"
+                                            }
+                                        }
+                                    }
+                                }
+                        }
+                    }
+
+                    return@suspendLogModule
+                }
+
+                val resolvedArguments = argumentToValueMap.map { (argumentDescriptor, value) ->
+                    ResolvedArgument.resolve(argumentDescriptor, value, this@Discord)
+                }.toSet()
+
+                val validationResults = mapOf(*resolvedArguments.map {
+                    it to it.validate()
+                }.toTypedArray())
+
+                if (validationResults.values.any { it is ValidationResult.Invalid }) {
+                    interaction.respondEphemeral {
+                        embed {
+                            title = "Command arguments failed validation"
+
+                            validationResults
+                                .forEach { (resolvedArgument, validationResult) ->
+                                    if (validationResult is ValidationResult.Invalid) {
+                                        field {
+                                            name = resolvedArgument.descriptor.name
+                                            value = validationResult.errors.joinToString("\n") {
+                                                "- `$it`"
+                                            }
+                                        }
+                                    }
+                                }
+                        }
+                    }
+                }
 
                 bot.commands.dispatchCommand(
                     handlingCommand, DiscordSlashCommandContext(
                         bot = bot,
                         module = registration.module,
+                        arguments = ResolvedArguments(resolvedArguments),
                         interaction = interaction,
                     )
                 )

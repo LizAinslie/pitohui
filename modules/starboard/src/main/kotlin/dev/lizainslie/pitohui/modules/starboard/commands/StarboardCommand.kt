@@ -44,10 +44,11 @@ val StarboardCommand = defineCommand(
         }
 
         handle {
-            val channel = args[channelArg] ?: return@handle
-            val threshold = args[thresholdArg] ?: 5
-            val emoji = Discord.parseEmojiIdentifier(args[emojiArg]!!)
-            val selfStar = args[selfStarArg] ?: false
+            val channel by channelArg.require()
+            val threshold by thresholdArg.require()
+            val emojiRaw by emojiArg.require()
+            val emoji = Discord.parseEmojiIdentifier(emojiRaw)
+            val selfStar by selfStarArg.require()
 
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
@@ -111,7 +112,7 @@ val StarboardCommand = defineCommand(
         }
 
         handle {
-            val channel = args[channelArg] ?: return@handle
+            val channel by channelArg.require()
 
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->

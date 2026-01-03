@@ -26,7 +26,7 @@ val AdminModuleCommand = defineCommand(
         }
 
         handle {
-            var moduleName = args[moduleNameArg]
+            val moduleName by moduleNameArg
 
             when (moduleName) {
                 null,
@@ -37,13 +37,13 @@ val AdminModuleCommand = defineCommand(
                 }
 
                 else -> {
-                    if (ModuleRegistry.instance.get(moduleName) == null) {
+                    if (ModuleRegistry.instance.get(moduleName!!) == null) {
                         respondError("Module `$moduleName` is not loaded.")
                         return@handle
                     }
 
                     val response = respond("Reloading module `$moduleName`...")
-                    ModuleRegistry.instance.reload(moduleName)
+                    ModuleRegistry.instance.reload(moduleName!!)
                     response.createFollowup("Module `$moduleName` reloaded.")
                 }
             }
@@ -68,13 +68,10 @@ val AdminModuleCommand = defineCommand(
     }
 
     subCommand("load_new", "Load a new module from a JAR file") {
-        val jarName = argument("jar_name", "The file name of the module JAR", ArgumentTypes.STRING)
+        val jarNameArg = argument("jar_name", "The file name of the module JAR", ArgumentTypes.STRING)
 
         handle {
-            val jarName = args[jarName] ?: run {
-                respondError("JAR name is required.")
-                return@handle
-            }
+            val jarName by jarNameArg.require()
 
             val jarFile = BotFS.modulesDir.resolve(jarName)
 

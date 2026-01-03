@@ -31,9 +31,10 @@ val AutoroleAdminCommand = defineCommand(
         }
 
         handle {
+            val roleId by roleArg.require()
+
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
-                    val roleId = args[roleArg]!!
 
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("This command can only be executed by someone who has permission to manage the server")
@@ -67,10 +68,10 @@ val AutoroleAdminCommand = defineCommand(
         }
 
         handle {
+            val roleId by roleArg.require()
+
             enforceDiscordType<DiscordCommandContext> {
                 enforceGuild { guild ->
-                    val roleId = args[roleArg]!!
-
                     if (!checkCallerPermission(Permission.ManageGuild)) {
                         respondError("This command can only be executed by someone who has permission to manage the server")
                         return@enforceGuild

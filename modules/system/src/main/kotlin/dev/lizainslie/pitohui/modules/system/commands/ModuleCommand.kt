@@ -79,9 +79,9 @@ val ModuleCommand = defineCommand("module", "Manage modules in your community") 
             }
 
         handle {
-            val moduleName = args[moduleNameArg]!!.lowercase()
+            val moduleName by moduleNameArg.require()
 
-            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName } ?: run {
+            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName.lowercase() } ?: run {
                 respondError("Module **$moduleName** does not exist.")
                 return@handle
             }
@@ -125,9 +125,9 @@ val ModuleCommand = defineCommand("module", "Manage modules in your community") 
             }
 
         handle {
-            val moduleName = args[moduleNameArg]!!.lowercase()
+            val moduleName by moduleNameArg.require()
 
-            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName } ?: run {
+            val module = bot.modules.loadedModules.firstOrNull { it.name == moduleName.lowercase() } ?: run {
                 respondError("Module **$moduleName** does not exist.")
                 return@handle
             }

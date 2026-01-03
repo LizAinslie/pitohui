@@ -31,6 +31,8 @@ val VcDisconnectCommand = defineCommand(
         }
 
         handle {
+            val duration by durationArgument.require()
+
             enforceDiscord {
                 enforceGuild { guild ->
                     val member = guild.getMemberOrNull(callerId.snowflake) ?: return@enforceGuild
@@ -40,7 +42,6 @@ val VcDisconnectCommand = defineCommand(
                     }
 
                     val channel = voiceState.channelId ?: return@enforceGuild
-                    val duration = args[durationArgument] ?: return@enforceGuild
 
                     VcDisconnectModule.addDisconnectTimer(guild.id.platform, DisconnectTimer(
                         user = callerId,
