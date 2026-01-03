@@ -63,7 +63,7 @@ val AdminModuleCommand = defineCommand(
         }
 
         handle {
-            var moduleName = args[moduleNameArg]
+            val moduleName by moduleNameArg
 
             when (moduleName) {
                 null,
@@ -74,7 +74,7 @@ val AdminModuleCommand = defineCommand(
                 }
 
                 else -> {
-                    val module = ModuleRegistry.instance.get(moduleName)
+                    val module = ModuleRegistry.instance.get(moduleName!!)
                     if (module == null) {
                         respondError("Module `$moduleName` is not loaded.")
                         return@handle
@@ -86,7 +86,7 @@ val AdminModuleCommand = defineCommand(
                     }
 
                     val response = respond("Unloading module `$moduleName`...")
-                    ModuleRegistry.instance.unload(moduleName)
+                    ModuleRegistry.instance.unload(moduleName!!)
                     response.createFollowup("Module `$moduleName` unloaded.")
                 }
             }
