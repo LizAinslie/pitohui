@@ -45,7 +45,7 @@ publishing {
             url.set("https://git.lizainslie.dev/crack-cafe/pitohui/")
             licenses {
                 license {
-                    name.set("The Apache License, Version 2.0")
+                    name.set("The MIT License (MIT)")
                     url.set("https://opensource.org/license/mit")
                     distribution.set("https://opensource.org/license/mit")
                 }
