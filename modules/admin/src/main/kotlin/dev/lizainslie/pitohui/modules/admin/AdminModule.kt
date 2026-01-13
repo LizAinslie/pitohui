@@ -5,6 +5,7 @@ import dev.lizainslie.pitohui.core.modules.ModuleVisibility
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
 import dev.lizainslie.pitohui.modules.admin.commands.AdminModuleCommand
+import dev.lizainslie.pitohui.modules.admin.commands.ConfigCommand
 import dev.lizainslie.pitohui.modules.admin.commands.DumpContextCommand
 import dev.lizainslie.pitohui.modules.admin.commands.MigrateCommand
 import dev.lizainslie.pitohui.modules.admin.commands.ShutdownCommand
@@ -24,6 +25,7 @@ object AdminModule : AbstractModule(
         DumpContextCommand,
         AdminModuleCommand,
         ShutdownCommand,
+        ConfigCommand,
     ),
     dependencies = setOf(SystemModule.name),
 ) {

@@ -2,6 +2,7 @@ package dev.lizainslie.pitohui.core.config
 
 import dev.lizainslie.pitohui.core.fs.BotFS
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import org.slf4j.LoggerFactory
@@ -11,12 +12,21 @@ import kotlin.reflect.KProperty
 
 class Config<TConfig : ConfigBase>(
     val key: String,
-    private val serializer: KSerializer<out TConfig>,
+    val serializer: KSerializer<TConfig>,
     klass: KClass<out TConfig>,
     val moduleName: String? = null
 ) {
     lateinit var currentValue: TConfig
         private set
+
+    val jsonValue by lazy {
+        prettyPrintJson.encodeToString(serializer, this.currentValue)
+    }
+
+    private val prettyPrintJson = Json {
+        prettyPrint = true
+        encodeDefaults = true
+    }
 
     private val json = Json {
         encodeDefaults = true
