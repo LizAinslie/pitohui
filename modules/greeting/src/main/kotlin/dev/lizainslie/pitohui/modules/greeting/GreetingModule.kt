@@ -12,6 +12,7 @@ import dev.lizainslie.pitohui.core.modules.AbstractModule
 import dev.lizainslie.pitohui.core.placeholder.placeholders
 import dev.lizainslie.pitohui.core.platforms.PlatformId
 import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
+import dev.lizainslie.pitohui.modules.greeting.commands.GreetingModuleConfigCommand
 import dev.lizainslie.pitohui.modules.greeting.data.entities.CommunityGreetingSettings
 import dev.lizainslie.pitohui.modules.greeting.data.tables.CommunityGreetingSettingsTable
 import dev.lizainslie.pitohui.platforms.discord.Discord
@@ -30,6 +31,9 @@ import org.jetbrains.exposed.sql.Except
 object GreetingModule : AbstractModule(
     name = "greeting",
     description = "A module that provides greeting commands.",
+    commands = setOf(
+        GreetingModuleConfigCommand
+    ),
     tables = setOf(
         CommunityGreetingSettingsTable
     )
@@ -58,7 +62,7 @@ object GreetingModule : AbstractModule(
      * @param communityId The ID of the community where the member joined.
      * @param userId The Snowflake ID of the member that joined.
      */
-    private suspend fun handleMemberJoin(communityId: PlatformId, userId: Snowflake) {
+    suspend fun handleMemberJoin(communityId: PlatformId, userId: Snowflake) {
         val settings = findSettings(communityId) ?: return
 
         val channel = settings.welcomeChannelId?.let {
@@ -155,7 +159,7 @@ object GreetingModule : AbstractModule(
      * @param communityId The ID of the community where the member left.
      * @param userId The Snowflake ID of the member that left.
      */
-    private suspend fun handleMemberLeave(communityId: PlatformId, userId: Snowflake) {
+    suspend fun handleMemberLeave(communityId: PlatformId, userId: Snowflake) {
         val settings = findSettings(communityId) ?: return
 
         val channel = settings.goodbyeChannelId?.let {

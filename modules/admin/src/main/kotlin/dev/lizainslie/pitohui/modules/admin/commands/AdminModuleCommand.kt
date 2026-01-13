@@ -1,7 +1,6 @@
 package dev.lizainslie.pitohui.modules.admin.commands
 
 import dev.lizainslie.pitohui.core.commands.BaseCommandDsl
-import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.fs.BotFS
