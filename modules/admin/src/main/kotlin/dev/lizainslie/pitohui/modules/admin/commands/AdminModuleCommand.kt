@@ -1,11 +1,24 @@
 package dev.lizainslie.pitohui.modules.admin.commands
 
+import dev.lizainslie.pitohui.core.commands.BaseCommandDsl
+import dev.lizainslie.pitohui.core.commands.argument.ArgumentDescriptor
 import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
 import dev.lizainslie.pitohui.core.commands.defineCommand
 import dev.lizainslie.pitohui.core.fs.BotFS
 import dev.lizainslie.pitohui.core.modules.ModuleRegistry
 import dev.lizainslie.pitohui.core.modules.ModuleSource
 import dev.lizainslie.pitohui.platforms.discord.Discord
+
+internal fun BaseCommandDsl.defineModuleNameArg() = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING) {
+    defaultValue = "all"
+
+    complete {
+        ModuleRegistry.instance.loadedModules
+            .filter { it.source == ModuleSource.EXTERNAL }
+            .map { it.name } +
+                listOf("all")
+    }
+}
 
 val AdminModuleCommand = defineCommand(
     name = "admin_module",
@@ -14,22 +27,12 @@ val AdminModuleCommand = defineCommand(
     platform(Discord)
 
     subCommand("reload", "Reload a module") {
-        val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING) {
-            defaultValue = "all"
-
-            complete {
-                ModuleRegistry.instance.loadedModules
-                    .filter { it.source == ModuleSource.EXTERNAL }
-                    .map { it.name } +
-                        listOf("all")
-            }
-        }
+        val moduleNameArg = defineModuleNameArg()
 
         handle {
-            val moduleName by moduleNameArg
+            val moduleName by moduleNameArg.require()
 
             when (moduleName) {
-                null,
                 "all" -> {
                     val response = respond("Reloading all external modules...")
                     ModuleRegistry.instance.fullReload()
@@ -37,13 +40,13 @@ val AdminModuleCommand = defineCommand(
                 }
 
                 else -> {
-                    if (ModuleRegistry.instance.get(moduleName!!) == null) {
+                    if (ModuleRegistry.instance.get(moduleName) == null) {
                         respondError("Module `$moduleName` is not loaded.")
                         return@handle
                     }
 
                     val response = respond("Reloading module `$moduleName`...")
-                    ModuleRegistry.instance.reload(moduleName!!)
+                    ModuleRegistry.instance.reload(moduleName)
                     response.createFollowup("Module `$moduleName` reloaded.")
                 }
             }
@@ -51,22 +54,12 @@ val AdminModuleCommand = defineCommand(
     }
 
     subCommand("unload", "Unload a module") {
-        val moduleNameArg = argument("module_name", "The name of the module to reload", ArgumentTypes.STRING) {
-            defaultValue = "all"
-
-            complete {
-                ModuleRegistry.instance.loadedModules
-                    .filter { it.source == ModuleSource.EXTERNAL }
-                    .map { it.name } +
-                        listOf("all")
-            }
-        }
+        val moduleNameArg = defineModuleNameArg()
 
         handle {
-            var moduleName = args[moduleNameArg]
+            val moduleName by moduleNameArg.require()
 
             when (moduleName) {
-                null,
                 "all" -> {
                     val response = respond("Unloading all external modules...")
                     ModuleRegistry.instance.unloadExternal()
