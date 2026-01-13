@@ -22,50 +22,60 @@ class DiscordSlashCommandContext(
     val interaction: ChatInputCommandInteraction
 ) : DiscordCommandContext(bot, module, arguments) {
     override suspend fun respond(text: String): DiscordSlashCommandResponse {
-        val kordResponse = interaction.respondPublic {
-            content = text
-        }
+        return (response?.createFollowup(text) ?: let {
+            val kordResponse = interaction.respondPublic {
+                content = text
+            }
 
-        response = DiscordSlashCommandResponse(kordResponse, this)
-        return response as DiscordSlashCommandResponse
+            response = DiscordSlashCommandResponse(kordResponse, this)
+            response
+        }) as DiscordSlashCommandResponse
     }
 
     override suspend fun respondPrivate(text: String): DiscordSlashCommandResponse {
-        val kordResponse = interaction.respondEphemeral {
-            content = text
-        }
+        return (response?.createPrivateFollowup(text) ?: let {
+            val kordResponse = interaction.respondEphemeral {
+                content = text
+            }
 
-        response = DiscordSlashCommandResponse(kordResponse, this)
-        return response as DiscordSlashCommandResponse
+            response = DiscordSlashCommandResponse(kordResponse, this)
+            response
+        }) as DiscordSlashCommandResponse
     }
 
     override suspend fun respondError(text: String): DiscordSlashCommandResponse {
-        val kordResponse = interaction.respondEphemeral {
-            content = text
-        }
+        return (response?.createPrivateFollowup(text) ?: let {
+            val kordResponse = interaction.respondEphemeral {
+                content = text
+            }
 
-        response = DiscordSlashCommandResponse(kordResponse, this)
-        return response as DiscordSlashCommandResponse
+            response = DiscordSlashCommandResponse(kordResponse, this)
+            response
+        }) as DiscordSlashCommandResponse
     }
 
     override suspend fun respond(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
-        val kordResponse = interaction.respondPublic {
-            content = text
-            embed(block)
-        }
+        return ((response as DiscordSlashCommandResponse?)?.createPrivateFollowup(text, block) ?: let {
+            val kordResponse = interaction.respondPublic {
+                content = text
+                embed(block)
+            }
 
-        response = DiscordSlashCommandResponse(kordResponse, this)
-        return response as DiscordSlashCommandResponse
+            response = DiscordSlashCommandResponse(kordResponse, this)
+            response
+        }) as DiscordSlashCommandResponse
     }
 
     override suspend fun respondPrivate(text: String, block: EmbedBuilder.() -> Unit): DiscordSlashCommandResponse {
-        val kordResponse = interaction.respondEphemeral {
-            content = text
-            embed(block)
-        }
+        return ((response as DiscordSlashCommandResponse?)?.createPrivateFollowup(text, block) ?: let {
+            val kordResponse = interaction.respondEphemeral {
+                content = text
+                embed(block)
+            }
 
-        response = DiscordSlashCommandResponse(kordResponse, this)
-        return response as DiscordSlashCommandResponse
+            response = DiscordSlashCommandResponse(kordResponse, this)
+            response
+        }) as DiscordSlashCommandResponse
     }
 
 //    override fun <T : Any> resolveRawArgumentValue(arg: ArgumentDescriptor<T>): T? {
