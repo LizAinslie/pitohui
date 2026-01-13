@@ -1,5 +1,16 @@
 .git
-root.example.d/
 pitohui.iml
 .idea
 .kotlin
+
+# ignore everything that isnt a .example.json
+root.example.d/config/platforms/discord.json
+root.example.d/config/command_parsing.json
+root.example.d/config/database.json
+root.example.d/config/logging.json
+root.example.d/bot.jar
+root.example.d/build.sh
+root.example.d/copy.sh
+root.example.d/start.sh
+root.example.d/docker-compose.yml
+root.example.d/pg_data
