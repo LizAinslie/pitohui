@@ -58,7 +58,7 @@ publishing {
                 }
             }
             scm {
-                url.set("https://github.com/username/mylibrary/")
+                url.set("https://git.lizainslie.dev/crack-cafe/pitohui/")
                 connection.set("scm:git:git://git.lizainslie.dev/crack-cafe/pitohui.git")
                 developerConnection.set("scm:git:ssh://git@git.lizainslie.dev/crack-cafe/pitohui.git")
             }
