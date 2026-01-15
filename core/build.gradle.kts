@@ -60,7 +60,7 @@ publishing {
             scm {
                 url.set("https://github.com/username/mylibrary/")
                 connection.set("scm:git:git://git.lizainslie.dev/crack-cafe/pitohui.git")
-                developerConnection.set("scm:git:ssh://git@gitl.izainslie.dev/crack-cafe/pitohui.git")
+                developerConnection.set("scm:git:ssh://git@git.lizainslie.dev/crack-cafe/pitohui.git")
             }
         }
     }
