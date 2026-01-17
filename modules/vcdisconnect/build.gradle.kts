@@ -7,9 +7,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":core"))
-    api(project(":platforms:discord"))
-
+    api(libs.bundles.moeka)
     implementation(libs.kord.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)

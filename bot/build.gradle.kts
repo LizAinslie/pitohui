@@ -9,11 +9,10 @@ plugins {
     application
 }
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":platforms:discord"))
     implementation(project(":modules:system"))
     implementation(project(":modules:admin"))
 
+    implementation(libs.bundles.moeka)
     implementation(libs.bundles.kord)
     implementation(libs.bundles.exposed)
     implementation(libs.bundles.logging)

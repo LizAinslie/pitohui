@@ -2,6 +2,9 @@ dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
+        maven {
+            url = uri("https://repo.lizainslie.dev/repository/maven-public/")
+        }
     }
 }
 
@@ -10,12 +13,8 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-// Bot & core
+// Bot
 include(":bot")
-include(":core")
-
-// Platform integrations
-include(":platforms:discord")
 
 // Modules
 include(":modules:example-module")

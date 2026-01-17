@@ -7,11 +7,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":core"))
-    api(project(":platforms:discord"))
-
     api(project(":modules:system"))
 
+    api(libs.bundles.moeka)
     implementation(libs.kord.core)
     implementation(libs.bundles.exposed)
     implementation(libs.kotlinx.serialization.json)
