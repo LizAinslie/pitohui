@@ -22,7 +22,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/bot" />
             <option value="$PROJECT_DIR$/buildSrc" />
-            <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/modules" />
             <option value="$PROJECT_DIR$/modules/admin" />
             <option value="$PROJECT_DIR$/modules/autorole" />
@@ -33,8 +32,6 @@
             <option value="$PROJECT_DIR$/modules/system" />
             <option value="$PROJECT_DIR$/modules/vcdisconnect" />
             <option value="$PROJECT_DIR$/modules/vcnotify" />
-            <option value="$PROJECT_DIR$/platforms" />
-            <option value="$PROJECT_DIR$/platforms/discord" />
           </set>
         </option>
       </GradleProjectSettings>

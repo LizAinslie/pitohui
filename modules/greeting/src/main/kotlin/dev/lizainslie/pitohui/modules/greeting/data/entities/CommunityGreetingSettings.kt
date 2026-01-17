@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.modules.greeting.data.entities
 
-import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.moeka.core.platforms.PlatformId
 import dev.lizainslie.pitohui.modules.greeting.data.tables.CommunityGreetingSettingsTable
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
@@ -8,7 +8,9 @@ import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
-class CommunityGreetingSettings(id: EntityID<CompositeID>) : CompositeEntity(id) {
+class CommunityGreetingSettings(
+    id: EntityID<CompositeID>,
+) : CompositeEntity(id) {
     val platform by CommunityGreetingSettingsTable.platform
     val communityId by CommunityGreetingSettingsTable.communityId
 
@@ -32,22 +34,20 @@ class CommunityGreetingSettings(id: EntityID<CompositeID>) : CompositeEntity(id)
             communityId: PlatformId,
             welcomeChannelId: PlatformId? = null,
             goodbyeChannelId: PlatformId? = null,
-
             welcomeMessage: String? = null,
             goodbyeMessage: String? = null,
-
             welcomeColor: String? = null,
             goodbyeColor: String? = null,
-
             welcomeImageUrl: String? = null,
             goodbyeImageUrl: String? = null,
-
             embedWelcome: Boolean = false,
-            embedGoodbye: Boolean = false
-        ) = new(CompositeID { id ->
-            id[CommunityGreetingSettingsTable.platform] = communityId.platform.key
-            id[CommunityGreetingSettingsTable.communityId] = communityId.id
-        }) {
+            embedGoodbye: Boolean = false,
+        ) = new(
+            CompositeID { id ->
+                id[CommunityGreetingSettingsTable.platform] = communityId.platform.key
+                id[CommunityGreetingSettingsTable.communityId] = communityId.id
+            },
+        ) {
             this.welcomeChannelId = welcomeChannelId?.id
             this.goodbyeChannelId = goodbyeChannelId?.id
 
@@ -64,11 +64,10 @@ class CommunityGreetingSettings(id: EntityID<CompositeID>) : CompositeEntity(id)
             this.embedGoodbye = embedGoodbye
         }
 
-        fun findByCommunityId(
-            communityId: PlatformId
-        ) = find {
-            (CommunityGreetingSettingsTable.platform eq communityId.platform.key) and
-            (CommunityGreetingSettingsTable.communityId eq communityId.id)
-        }.firstOrNull()
+        fun findByCommunityId(communityId: PlatformId) =
+            find {
+                (CommunityGreetingSettingsTable.platform eq communityId.platform.key) and
+                    (CommunityGreetingSettingsTable.communityId eq communityId.id)
+            }.firstOrNull()
     }
 }

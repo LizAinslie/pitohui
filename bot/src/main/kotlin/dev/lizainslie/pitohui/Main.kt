@@ -2,10 +2,11 @@ package dev.lizainslie.pitohui
 
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.command.main
-import dev.lizainslie.pitohui.core.Bot
+import dev.lizainslie.moeka.core.Bot
+import dev.lizainslie.moeka.platforms.discord.Discord
+
 import dev.lizainslie.pitohui.modules.admin.AdminModule
 import dev.lizainslie.pitohui.modules.system.SystemModule
-import dev.lizainslie.pitohui.platforms.discord.Discord
 
 class PitohuiBot : SuspendingCliktCommand() {
     override suspend fun run() {

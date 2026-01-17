@@ -13,19 +13,19 @@ import dev.kord.core.event.message.ReactionRemoveEvent
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
-import dev.lizainslie.pitohui.core.Bot
-import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.modules.ModuleVisibility
-import dev.lizainslie.pitohui.core.platforms.PlatformId
-import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
+import dev.lizainslie.moeka.core.Bot
+import dev.lizainslie.moeka.core.modules.AbstractModule
+import dev.lizainslie.moeka.core.modules.ModuleVisibility
+import dev.lizainslie.moeka.core.platforms.PlatformId
+import dev.lizainslie.moeka.core.platforms.SupportPlatforms
+import dev.lizainslie.moeka.platforms.discord.Discord
+import dev.lizainslie.moeka.platforms.discord.extensions.getIdentifier
+import dev.lizainslie.moeka.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.modules.starboard.commands.StarboardCommand
 import dev.lizainslie.pitohui.modules.starboard.data.entities.Starboard
 import dev.lizainslie.pitohui.modules.starboard.data.entities.StarboardEntry
 import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardEntryTable
 import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardTable
-import dev.lizainslie.pitohui.platforms.discord.Discord
-import dev.lizainslie.pitohui.platforms.discord.extensions.getIdentifier
-import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
@@ -36,32 +36,43 @@ object StarboardModule : AbstractModule(
     name = "starboard",
     description = "Highlight popular messages in a dedicated channel.",
     visibility = ModuleVisibility.MODERATOR,
-    commands = setOf(
-        StarboardCommand
-    ),
-    tables = setOf(
-        StarboardTable,
-        StarboardEntryTable
-    ),
+    commands =
+        setOf(
+            StarboardCommand,
+        ),
+    tables =
+        setOf(
+            StarboardTable,
+            StarboardEntryTable,
+        ),
 ) {
-    suspend fun emojiRepresentation(emoji: String, guild: Guild): String? {
-        return if (emoji.all { it.isDigit() }) {
+    suspend fun emojiRepresentation(
+        emoji: String,
+        guild: Guild,
+    ): String? =
+        if (emoji.all { it.isDigit() }) {
             val discordEmoji = guild.getEmojiOrNull(Snowflake(emoji))
             discordEmoji?.mention
-        } else emoji
-    }
+        } else {
+            emoji
+        }
 
-    suspend fun createReactionEmojiFromRepresentation(emoji: String, guild: Guild): ReactionEmoji? {
-        return if (emoji.all { it.isDigit() }) {
+    suspend fun createReactionEmojiFromRepresentation(
+        emoji: String,
+        guild: Guild,
+    ): ReactionEmoji? =
+        if (emoji.all { it.isDigit() }) {
             val discordEmoji = guild.getEmojiOrNull(Snowflake(emoji))
-            discordEmoji?.let { ReactionEmoji.Custom(
-                it.id, it.name!!,
-                isAnimated = it.isAnimated
-            ) }
+            discordEmoji?.let {
+                ReactionEmoji.Custom(
+                    it.id,
+                    it.name!!,
+                    isAnimated = it.isAnimated,
+                )
+            }
         } else {
             ReactionEmoji.Unicode(emoji)
         }
-    }
 
     override fun onInit(bot: Bot) {
         super.onInit(bot)
@@ -78,11 +89,12 @@ object StarboardModule : AbstractModule(
                 if (userId == Discord.myId) return@addEventListener
 
                 log.debug("reacted message is in starboard channel, checking for existing entry")
-                val existingEntry = findStarboardEntryFromStarboardMessage(
-                    communityId = guildId!!.platform,
-                    channelId = channelId.platform,
-                    messageId = message.id.platform
-                )
+                val existingEntry =
+                    findStarboardEntryFromStarboardMessage(
+                        communityId = guildId!!.platform,
+                        channelId = channelId.platform,
+                        messageId = message.id.platform,
+                    )
 
                 if (existingEntry != null) {
                     log.debug("found existing starboard entry for reacted message")
@@ -116,11 +128,12 @@ object StarboardModule : AbstractModule(
                 log.debug("reacted message is not in starboard channel, checking for existing entry")
                 // message reacted to is an original message, check if it already has a starboard entry
 
-                val existingEntry = findStarboardEntryFromOriginalMessage(
-                    communityId = guildId!!.platform,
-                    starboardChannelId = PlatformId(Discord.key, starboard.channelId.value),
-                    messageId = message.id.platform
-                )
+                val existingEntry =
+                    findStarboardEntryFromOriginalMessage(
+                        communityId = guildId!!.platform,
+                        starboardChannelId = PlatformId(Discord.key, starboard.channelId.value),
+                        messageId = message.id.platform,
+                    )
 
                 if (existingEntry != null) {
                     log.debug("found existing starboard entry for reacted message")
@@ -137,11 +150,12 @@ object StarboardModule : AbstractModule(
                     // message does not have a starboard entry yet, will need to create one if threshold is met
 
                     if (stars >= starboard.starThreshold) {
-                        val starboardMessageId = postNewStarboardEmbed(
-                            starboard = starboard,
-                            message = message.fetchMessage(),
-                            starCount = stars
-                        )
+                        val starboardMessageId =
+                            postNewStarboardEmbed(
+                                starboard = starboard,
+                                message = message.fetchMessage(),
+                                starCount = stars,
+                            )
 
                         log.debug("posted new starboard embed for message, id: $starboardMessageId")
 
@@ -153,7 +167,7 @@ object StarboardModule : AbstractModule(
                                     starboardChannelMessageId = starboardMessageId.value.toString(),
                                     channelId = channelId.platform,
                                     messageId = message.id.platform,
-                                    starCount = stars
+                                    starCount = stars,
                                 )
                             }
                         }
@@ -173,11 +187,12 @@ object StarboardModule : AbstractModule(
             if (channelId.value.toString() == starboard.channelId.value) {
                 if (userId == Discord.myId) return@addEventListener // ignore bot removals in starboard channel
 
-                val entry = findStarboardEntryFromStarboardMessage(
-                    communityId = guildId!!.platform,
-                    channelId = channelId.platform,
-                    messageId = message.id.platform
-                ) ?: return@addEventListener
+                val entry =
+                    findStarboardEntryFromStarboardMessage(
+                        communityId = guildId!!.platform,
+                        channelId = channelId.platform,
+                        messageId = message.id.platform,
+                    ) ?: return@addEventListener
 
                 // todo: decrement star count, update starboard embed, etc.
 
@@ -190,13 +205,16 @@ object StarboardModule : AbstractModule(
                     newSuspendedTransaction {
                         entry.delete()
                     }
-                } else editStarboardEmbed(starboard, entry)
+                } else {
+                    editStarboardEmbed(starboard, entry)
+                }
             } else {
-                val entry = findStarboardEntryFromOriginalMessage(
-                    communityId = guildId!!.platform,
-                    starboardChannelId = PlatformId(Discord.key, starboard.channelId.value),
-                    messageId = message.id.platform
-                ) ?: return@addEventListener
+                val entry =
+                    findStarboardEntryFromOriginalMessage(
+                        communityId = guildId!!.platform,
+                        starboardChannelId = PlatformId(Discord.key, starboard.channelId.value),
+                        messageId = message.id.platform,
+                    ) ?: return@addEventListener
 
                 newSuspendedTransaction {
                     entry.starCount--
@@ -213,54 +231,69 @@ object StarboardModule : AbstractModule(
                     newSuspendedTransaction {
                         entry.delete()
                     }
-                } else editStarboardEmbed(starboard, entry)
+                } else {
+                    editStarboardEmbed(starboard, entry)
+                }
             }
         }
     }
 
-    suspend fun getStarboard(communityId: PlatformId, emoji: String) =
-        newSuspendedTransaction {
-            Starboard.findByReactionForCommunity(communityId, emoji)
-        }
+    suspend fun getStarboard(
+        communityId: PlatformId,
+        emoji: String,
+    ) = newSuspendedTransaction {
+        Starboard.findByReactionForCommunity(communityId, emoji)
+    }
 
-    suspend fun countStars(message: MessageBehavior, emoji: ReactionEmoji, starboard: Starboard, userId: Snowflake): Int {
+    suspend fun countStars(
+        message: MessageBehavior,
+        emoji: ReactionEmoji,
+        starboard: Starboard,
+        userId: Snowflake,
+    ): Int {
         val reactors = message.getReactors(emoji)
 
-        return if (!starboard.selfStarAllowed)
+        return if (!starboard.selfStarAllowed) {
             reactors.filter { it.id != userId }.count()
-        else reactors.count()
+        } else {
+            reactors.count()
+        }
     }
 
     suspend fun findStarboardEntryFromStarboardMessage(
         communityId: PlatformId,
         channelId: PlatformId,
-        messageId: PlatformId
+        messageId: PlatformId,
     ) = newSuspendedTransaction {
         StarboardEntry.findByStarboardMessageId(
             communityId = communityId,
             starboardChannelId = channelId,
-            starboardChannelMessageId = messageId
+            starboardChannelMessageId = messageId,
         )
     }
 
     suspend fun findStarboardEntryFromOriginalMessage(
         communityId: PlatformId,
         starboardChannelId: PlatformId,
-        messageId: PlatformId
+        messageId: PlatformId,
     ) = newSuspendedTransaction {
         StarboardEntry.findByMessageId(
             communityId = communityId,
             starboardChannelId = starboardChannelId,
-            messageId = messageId
+            messageId = messageId,
         )
     }
 
-    suspend fun postNewStarboardEmbed(starboard: Starboard, message: Message, starCount: Int) =
-        Discord.getGuildById(starboard.communityId.value)?.let { guild ->
-            val emojiRep = emojiRepresentation(starboard.emoji, guild) ?: starboard.emoji
-            Discord.getChannelById(starboard.channelId.value)?.let { channel ->
-                if (channel is MessageChannel) {
-                    val newMessage = channel.createMessage {
+    suspend fun postNewStarboardEmbed(
+        starboard: Starboard,
+        message: Message,
+        starCount: Int,
+    ) = Discord.getGuildById(starboard.communityId.value)?.let { guild ->
+        val emojiRep = emojiRepresentation(starboard.emoji, guild) ?: starboard.emoji
+        Discord.getChannelById(starboard.channelId.value)?.let { channel ->
+            if (channel is MessageChannel) {
+                val newMessage =
+                    channel.createMessage {
                         embed {
                             buildStarboardEmbed(starboard.communityId.value, message, starCount, emojiRep)
                         }
@@ -312,25 +345,33 @@ object StarboardModule : AbstractModule(
                         }
                     }
 
-                    val reactionEmoji = createReactionEmojiFromRepresentation(starboard.emoji, guild)
-                    if (reactionEmoji != null) newMessage.addReaction(reactionEmoji)
+                val reactionEmoji = createReactionEmojiFromRepresentation(starboard.emoji, guild)
+                if (reactionEmoji != null) newMessage.addReaction(reactionEmoji)
 
-                    newMessage.id
-                } else null
+                newMessage.id
+            } else {
+                null
             }
         }
+    }
 
-    suspend fun editStarboardEmbed(starboard: Starboard, entry: StarboardEntry) {
+    suspend fun editStarboardEmbed(
+        starboard: Starboard,
+        entry: StarboardEntry,
+    ) {
         Discord.getGuildById(starboard.communityId.value)?.let { guild ->
             val emojiRep = emojiRepresentation(starboard.emoji, guild) ?: starboard.emoji
             Discord.getChannelById(starboard.channelId.value)?.let { channel ->
                 if (channel is MessageChannel) {
                     val starboardMessage = channel.getMessage(Snowflake(entry.starboardChannelMessageId.value))
-                    val originalMessage = Discord.getChannelById(entry.channelId)?.let { originalChannel ->
-                        if (originalChannel is MessageChannel) {
-                            originalChannel.getMessage(Snowflake(entry.messageId.value))
-                        } else null
-                    } ?: return
+                    val originalMessage =
+                        Discord.getChannelById(entry.channelId)?.let { originalChannel ->
+                            if (originalChannel is MessageChannel) {
+                                originalChannel.getMessage(Snowflake(entry.messageId.value))
+                            } else {
+                                null
+                            }
+                        } ?: return
 
                     starboardMessage.edit {
                         embed {
@@ -342,13 +383,19 @@ object StarboardModule : AbstractModule(
         }
     }
 
-    fun EmbedBuilder.buildStarboardEmbed(communityId: String, originalMessage: Message, starCount: Int, emoji: String = "⭐") {
+    fun EmbedBuilder.buildStarboardEmbed(
+        communityId: String,
+        originalMessage: Message,
+        starCount: Int,
+        emoji: String = "⭐",
+    ) {
         author {
             name = originalMessage.author?.username
-            icon = originalMessage.author?.avatar?.cdnUrl?.toUrl {
-                size = Image.Size.Size32
-                format = Image.Format.PNG
-            }
+            icon =
+                originalMessage.author?.avatar?.cdnUrl?.toUrl {
+                    size = Image.Size.Size32
+                    format = Image.Format.PNG
+                }
         }
 
         title = "$emoji $starCount"
@@ -359,7 +406,8 @@ object StarboardModule : AbstractModule(
             description += "[${originalMessage.embeds.size} embed${if (originalMessage.embeds.size > 1) "s" else ""}]"
         }
 
-        description += "\n\n[Jump to Message](https://discord.com/channels/\$communityId/\${originalMessage.channelId.value}/\${originalMessage.id.value})"
+        description +=
+            "\n\n[Jump to Message](https://discord.com/channels/\$communityId/\${originalMessage.channelId.value}/\${originalMessage.id.value})"
 
         if (originalMessage.attachments.isNotEmpty()) {
             image = originalMessage.attachments.first().url

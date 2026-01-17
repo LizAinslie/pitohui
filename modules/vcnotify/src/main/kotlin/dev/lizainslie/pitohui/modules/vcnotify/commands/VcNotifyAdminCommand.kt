@@ -2,14 +2,14 @@ package dev.lizainslie.pitohui.modules.vcnotify.commands
 
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
-import dev.lizainslie.pitohui.core.commands.argument.ArgumentTypes
-import dev.lizainslie.pitohui.core.commands.defineCommand
+import dev.lizainslie.moeka.core.commands.argument.ArgumentTypes
+import dev.lizainslie.moeka.core.commands.defineCommand
+import dev.lizainslie.moeka.platforms.discord.Discord
+import dev.lizainslie.moeka.platforms.discord.commands.enforceDiscord
+import dev.lizainslie.moeka.platforms.discord.extensions.platform
+import dev.lizainslie.moeka.platforms.discord.extensions.snowflake
+import dev.lizainslie.moeka.util.time.format
 import dev.lizainslie.pitohui.modules.vcnotify.data.entities.VcNotifySettings
-import dev.lizainslie.pitohui.platforms.discord.Discord
-import dev.lizainslie.pitohui.platforms.discord.commands.enforceDiscord
-import dev.lizainslie.pitohui.platforms.discord.extensions.platform
-import dev.lizainslie.pitohui.platforms.discord.extensions.snowflake
-import dev.lizainslie.pitohui.util.time.format
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration.Companion.minutes
 

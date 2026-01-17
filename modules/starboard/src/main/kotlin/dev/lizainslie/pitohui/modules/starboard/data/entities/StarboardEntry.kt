@@ -1,6 +1,6 @@
 package dev.lizainslie.pitohui.modules.starboard.data.entities
 
-import dev.lizainslie.pitohui.core.platforms.PlatformId
+import dev.lizainslie.moeka.core.platforms.PlatformId
 import dev.lizainslie.pitohui.modules.starboard.data.tables.StarboardEntryTable
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
@@ -8,7 +8,9 @@ import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
-class StarboardEntry(id: EntityID<CompositeID>) : CompositeEntity(id) {
+class StarboardEntry(
+    id: EntityID<CompositeID>,
+) : CompositeEntity(id) {
     val platform by StarboardEntryTable.platform
     val communityId by StarboardEntryTable.communityId
     val starboardChannelId by StarboardEntryTable.starboardChannelId
@@ -25,13 +27,15 @@ class StarboardEntry(id: EntityID<CompositeID>) : CompositeEntity(id) {
             channelId: PlatformId,
             messageId: PlatformId,
             starCount: Int = 0,
-        ) = new(CompositeID { id ->
-            id[StarboardEntryTable.platform] = communityId.platform.key
-            id[StarboardEntryTable.communityId] = communityId.id
-            id[StarboardEntryTable.starboardChannelId] = starboardChannelId.id
-            id[StarboardEntryTable.starboardChannelMessageId] = starboardChannelMessageId
-            id[StarboardEntryTable.messageId] = messageId.id
-        }) {
+        ) = new(
+            CompositeID { id ->
+                id[StarboardEntryTable.platform] = communityId.platform.key
+                id[StarboardEntryTable.communityId] = communityId.id
+                id[StarboardEntryTable.starboardChannelId] = starboardChannelId.id
+                id[StarboardEntryTable.starboardChannelMessageId] = starboardChannelMessageId
+                id[StarboardEntryTable.messageId] = messageId.id
+            },
+        ) {
             this.starCount = starCount
             this.channelId = channelId.id
         }
@@ -42,9 +46,9 @@ class StarboardEntry(id: EntityID<CompositeID>) : CompositeEntity(id) {
             messageId: PlatformId,
         ) = find {
             (StarboardEntryTable.platform eq communityId.platform.key) and
-            (StarboardEntryTable.communityId eq communityId.id) and
-            (StarboardEntryTable.starboardChannelId eq starboardChannelId.id) and
-            (StarboardEntryTable.messageId eq messageId.id)
+                (StarboardEntryTable.communityId eq communityId.id) and
+                (StarboardEntryTable.starboardChannelId eq starboardChannelId.id) and
+                (StarboardEntryTable.messageId eq messageId.id)
         }.firstOrNull()
 
         fun findByStarboardMessageId(
@@ -53,9 +57,9 @@ class StarboardEntry(id: EntityID<CompositeID>) : CompositeEntity(id) {
             starboardChannelMessageId: PlatformId,
         ) = find {
             (StarboardEntryTable.platform eq communityId.platform.key) and
-            (StarboardEntryTable.communityId eq communityId.id) and
-            (StarboardEntryTable.starboardChannelId eq starboardChannelId.id) and
-            (StarboardEntryTable.starboardChannelMessageId eq starboardChannelMessageId.id)
+                (StarboardEntryTable.communityId eq communityId.id) and
+                (StarboardEntryTable.starboardChannelId eq starboardChannelId.id) and
+                (StarboardEntryTable.starboardChannelMessageId eq starboardChannelMessageId.id)
         }.firstOrNull()
     }
 }

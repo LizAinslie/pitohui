@@ -7,51 +7,51 @@ import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberLeaveEvent
 import dev.kord.rest.builder.message.addFile
 import dev.kord.rest.builder.message.embed
-import dev.lizainslie.pitohui.core.Bot
-import dev.lizainslie.pitohui.core.modules.AbstractModule
-import dev.lizainslie.pitohui.core.placeholder.placeholders
-import dev.lizainslie.pitohui.core.platforms.PlatformId
-import dev.lizainslie.pitohui.core.platforms.SupportPlatforms
+import dev.lizainslie.moeka.core.Bot
+import dev.lizainslie.moeka.core.modules.AbstractModule
+import dev.lizainslie.moeka.core.placeholder.placeholders
+import dev.lizainslie.moeka.core.platforms.PlatformId
+import dev.lizainslie.moeka.core.platforms.SupportPlatforms
+import dev.lizainslie.moeka.platforms.discord.Discord
+import dev.lizainslie.moeka.platforms.discord.extensions.kordColor
+import dev.lizainslie.moeka.platforms.discord.extensions.platform
 import dev.lizainslie.pitohui.modules.greeting.commands.GreetingModuleConfigCommand
 import dev.lizainslie.pitohui.modules.greeting.data.entities.CommunityGreetingSettings
 import dev.lizainslie.pitohui.modules.greeting.data.tables.CommunityGreetingSettingsTable
-import dev.lizainslie.pitohui.platforms.discord.Discord
-import dev.lizainslie.pitohui.platforms.discord.extensions.kordColor
-import dev.lizainslie.pitohui.platforms.discord.extensions.platform
 import kotlinx.datetime.Clock
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import java.awt.Color
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jetbrains.exposed.sql.Except
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import java.awt.Color
 
 @SupportPlatforms(Discord::class)
 object GreetingModule : AbstractModule(
     name = "greeting",
     description = "A module that provides greeting commands.",
-    commands = setOf(
-        GreetingModuleConfigCommand
-    ),
-    tables = setOf(
-        CommunityGreetingSettingsTable
-    )
+    commands =
+        setOf(
+            GreetingModuleConfigCommand,
+        ),
+    tables =
+        setOf(
+            CommunityGreetingSettingsTable,
+        ),
 ) {
     override fun onInit(bot: Bot) {
         super.onInit(bot)
 
         Discord.addEventListener<MemberJoinEvent> {
-             handleMemberJoin(
-                 communityId = guildId.platform,
-                 userId = member.id
-             )
+            handleMemberJoin(
+                communityId = guildId.platform,
+                userId = member.id,
+            )
         }
 
         Discord.addEventListener<MemberLeaveEvent> {
             handleMemberLeave(
                 communityId = guildId.platform,
-                userId = user.id
+                userId = user.id,
             )
         }
     }
@@ -62,16 +62,21 @@ object GreetingModule : AbstractModule(
      * @param communityId The ID of the community where the member joined.
      * @param userId The Snowflake ID of the member that joined.
      */
-    suspend fun handleMemberJoin(communityId: PlatformId, userId: Snowflake) {
+    suspend fun handleMemberJoin(
+        communityId: PlatformId,
+        userId: Snowflake,
+    ) {
         val settings = findSettings(communityId) ?: return
 
-        val channel = settings.welcomeChannelId?.let {
-            Discord.getChannelById(it)
-        } ?: return
+        val channel =
+            settings.welcomeChannelId?.let {
+                Discord.getChannelById(it)
+            } ?: return
 
-        val placeholders = placeholders {
-            replace("user_mention", "<@$userId>")
-        }
+        val placeholders =
+            placeholders {
+                replace("user_mention", "<@$userId>")
+            }
 
         if (channel is MessageChannel) {
             withTempContextSuspend {
@@ -101,9 +106,11 @@ object GreetingModule : AbstractModule(
                             val tmpImg = file("welcome-image_${communityId.id}")
 
                             val httpClient = OkHttpClient()
-                            val request = Request.Builder()
-                                .url(it)
-                                .build()
+                            val request =
+                                Request
+                                    .Builder()
+                                    .url(it)
+                                    .build()
 
                             httpClient.newCall(request).execute().use { response ->
                                 if (!response.isSuccessful) {
@@ -111,30 +118,33 @@ object GreetingModule : AbstractModule(
                                     return@let
                                 }
 
-                                val body = response.body ?: run {
-                                    log.warn("Downloaded welcome image but there's no body (wtf??)")
-                                    return@let
-                                }
-
-                                val bodyType = body.contentType()
-                                    ?: response.header("Content-Type")?.toMediaTypeOrNull()
-                                    ?: run {
-                                        log.warn("Downloaded welcome image but cannot determine image type")
+                                val body =
+                                    response.body ?: run {
+                                        log.warn("Downloaded welcome image but there's no body (wtf??)")
                                         return@let
                                     }
+
+                                val bodyType =
+                                    body.contentType()
+                                        ?: response.header("Content-Type")?.toMediaTypeOrNull()
+                                        ?: run {
+                                            log.warn("Downloaded welcome image but cannot determine image type")
+                                            return@let
+                                        }
 
                                 if (bodyType.type != "image") {
                                     log.warn("Downloaded welcome image but non-image content detected")
                                     return@let
                                 }
 
-                                val imgFileExt = when (bodyType.subtype) {
-                                    "png" -> "png"
-                                    "jpg", "jpeg" -> "jpg"
-                                    "gif" -> "gif"
-                                    "webp" -> "webp"
-                                    else -> throw Exception("Welcome image is unknown image subtype ${bodyType.subtype}")
-                                }
+                                val imgFileExt =
+                                    when (bodyType.subtype) {
+                                        "png" -> "png"
+                                        "jpg", "jpeg" -> "jpg"
+                                        "gif" -> "gif"
+                                        "webp" -> "webp"
+                                        else -> throw Exception("Welcome image is unknown image subtype ${bodyType.subtype}")
+                                    }
 
                                 tmpImg.outputStream().use { fileOut ->
                                     body.byteStream().use { fileIn ->
@@ -159,16 +169,21 @@ object GreetingModule : AbstractModule(
      * @param communityId The ID of the community where the member left.
      * @param userId The Snowflake ID of the member that left.
      */
-    suspend fun handleMemberLeave(communityId: PlatformId, userId: Snowflake) {
+    suspend fun handleMemberLeave(
+        communityId: PlatformId,
+        userId: Snowflake,
+    ) {
         val settings = findSettings(communityId) ?: return
 
-        val channel = settings.goodbyeChannelId?.let {
-            Discord.getChannelById(it)
-        } ?: return
+        val channel =
+            settings.goodbyeChannelId?.let {
+                Discord.getChannelById(it)
+            } ?: return
 
-        val placeholders = placeholders {
-            replace("user_mention", "<@$userId>")
-        }
+        val placeholders =
+            placeholders {
+                replace("user_mention", "<@$userId>")
+            }
 
         if (channel is MessageChannel) {
             withTempContextSuspend {
@@ -198,9 +213,11 @@ object GreetingModule : AbstractModule(
                             val tmpImg = file("goodbye-image_${communityId.id}")
 
                             val httpClient = OkHttpClient()
-                            val request = Request.Builder()
-                                .url(it)
-                                .build()
+                            val request =
+                                Request
+                                    .Builder()
+                                    .url(it)
+                                    .build()
 
                             httpClient.newCall(request).execute().use { response ->
                                 if (!response.isSuccessful) {
@@ -208,30 +225,33 @@ object GreetingModule : AbstractModule(
                                     return@let
                                 }
 
-                                val body = response.body ?: run {
-                                    log.warn("Downloaded goodbye image but there's no body (wtf??)")
-                                    return@let
-                                }
-
-                                val bodyType = body.contentType()
-                                    ?: response.header("Content-Type")?.toMediaTypeOrNull()
-                                    ?: run {
-                                        log.warn("Downloaded goodbye image but cannot determine image type")
+                                val body =
+                                    response.body ?: run {
+                                        log.warn("Downloaded goodbye image but there's no body (wtf??)")
                                         return@let
                                     }
+
+                                val bodyType =
+                                    body.contentType()
+                                        ?: response.header("Content-Type")?.toMediaTypeOrNull()
+                                        ?: run {
+                                            log.warn("Downloaded goodbye image but cannot determine image type")
+                                            return@let
+                                        }
 
                                 if (bodyType.type != "image") {
                                     log.warn("Downloaded goodbye image but non-image content detected")
                                     return@let
                                 }
 
-                                val imgFileExt = when (bodyType.subtype) {
-                                    "png" -> "png"
-                                    "jpg", "jpeg" -> "jpg"
-                                    "gif" -> "gif"
-                                    "webp" -> "webp"
-                                    else -> throw Exception("Goodbye image is unknown image subtype ${bodyType.subtype}")
-                                }
+                                val imgFileExt =
+                                    when (bodyType.subtype) {
+                                        "png" -> "png"
+                                        "jpg", "jpeg" -> "jpg"
+                                        "gif" -> "gif"
+                                        "webp" -> "webp"
+                                        else -> throw Exception("Goodbye image is unknown image subtype ${bodyType.subtype}")
+                                    }
 
                                 tmpImg.outputStream().use { fileOut ->
                                     body.byteStream().use { fileIn ->
