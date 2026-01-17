@@ -11,7 +11,6 @@ kord = "0.15.0"
 clikt = "5.0.1"
 exposed = "0.61.0"
 okhttp = "5.3.0"
-mavenPublish = "0.35.0"
 moeka = "0.0.1"
 ktlint = "14.0.1"
 
@@ -46,6 +45,5 @@ moeka = ["moeka-core", "moeka-discord"]
 
 [plugins]
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 shadow = { id = "com.gradleup.shadow", version = "9.0.0-beta15" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }

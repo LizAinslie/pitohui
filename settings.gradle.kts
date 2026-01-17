@@ -17,7 +17,6 @@ plugins {
 include(":bot")
 
 // Modules
-include(":modules:example-module")
 include(":modules:system")
 include(":modules:starboard")
 include(":modules:greeting")
